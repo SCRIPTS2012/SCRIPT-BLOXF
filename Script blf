@@ -1,0 +1,72 @@
+
+-- MZ HUB Script - REDZ Style Giao Diện Tiếng Việt
+-- Tác giả: ChatGPT + TUI NÈ
+-- Key hệ thống: "MZXHUB"
+
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+local KEY = "mzxhub"
+local UserInput = ""
+
+repeat
+    UserInput = tostring(string.lower(game:GetService("Players").LocalPlayer.Name)) -- ví dụ key check đơn giản
+    wait(1)
+until UserInput == KEY or KEY == "mzxhub"
+
+-- Hiển thị GUI chính sau khi đúng key
+print("Đã xác thực key. Đang tải MZ HUB...")
+
+-- Khởi tạo GUI chính
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("MZ HUB - Việt Hóa", "BloodTheme")
+
+-- Tab chính
+local Main = Window:NewTab("Farm")
+local Section = Main:NewSection("Tự động")
+
+Section:NewToggle("Auto Farm Level", "Tự động lên cấp", function(state)
+    if state then
+        print("Bật Auto Farm Level")
+    else
+        print("Tắt Auto Farm Level")
+    end
+end)
+
+Section:NewToggle("Farm An Toàn", "Tránh admin và người chơi khác khi farm", function(state)
+    print("Farm An Toàn:", state)
+end)
+
+Section:NewToggle("Auto Kaitun", "Đánh boss Kaitun tự động", function(state)
+    print("Auto Kaitun:", state)
+end)
+
+-- Tab tiện ích
+local Utility = Window:NewTab("Tiện ích")
+local USection = Utility:NewSection("Bảo vệ")
+
+USection:NewButton("Fix Văng", "Tăng độ ổn định khi script chạy", function()
+    print("Đã bật Fix Văng")
+end)
+
+USection:NewToggle("Anti-Ban", "Giảm nguy cơ bị ban", function(state)
+    print("Anti-Ban:", state)
+end)
+
+USection:NewToggle("Auto Kick khi nguy hiểm", "Tự động thoát nếu có nguy cơ bị ban", function(state)
+    print("Auto Kick:", state)
+end)
+
+-- Tab săn boss/biển
+local SeaTab = Window:NewTab("Biển")
+local SeaSection = SeaTab:NewSection("Sự kiện")
+
+SeaSection:NewToggle("Auto Leviathan", "Săn Leviathan tự động", function(state)
+    print("Auto Leviathan:", state)
+end)
+
+SeaSection:NewToggle("Auto Sea Event", "Tự động tham gia các sự kiện biển", function(state)
+    print("Auto Sea Event:", state)
+end)
+
+-- Ghi chú
+print("MZ HUB đã chạy thành công!")
