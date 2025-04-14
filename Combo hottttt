@@ -1,0 +1,11 @@
+-- Combo Script: Hitbox Expander + Basic PvP Script (Mobile Friendly)
+
+-- Hitbox Expander
+pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/RedJDarks/MAIN/refs/heads/main/HitboxExpander"))()
+end)
+
+-- Basic PvP Script
+pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/JNHHGaming/Basic-PvP-Script/refs/heads/main/Basic%20PvP%20Script", true))()
+end)
