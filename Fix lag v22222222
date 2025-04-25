@@ -1,0 +1,38 @@
+-- MZ HUB - Tự động xóa hiệu ứng, particle, ánh sáng, tăng FPS (không xóa hoạt ảnh)
+
+pcall(function()
+    -- Xóa hiệu ứng ánh sáng
+    local Lighting = game:GetService("Lighting")
+    Lighting.FogEnd = 100000
+    Lighting.Brightness = 0
+    Lighting.GlobalShadows = false
+    Lighting.ClockTime = 12
+
+    -- Xóa các hiệu ứng trong Lighting
+    for _, v in pairs(Lighting:GetChildren()) do
+        if v:IsA("PostEffect") or v:IsA("Atmosphere") or v:IsA("BloomEffect") 
+        or v:IsA("ColorCorrectionEffect") or v:IsA("SunRaysEffect") then
+            v:Destroy()
+        end
+    end
+
+    -- Xóa decal, texture, particle, smoke, trail, fire, mesh
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("Decal") or v:IsA("Texture") or v:IsA("ParticleEmitter") 
+        or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") 
+        or v:IsA("Beam") then
+            v:Destroy()
+        elseif v:IsA("BasePart") then
+            v.Material = Enum.Material.SmoothPlastic
+            v.Reflectance = 0
+            v.CastShadow = false
+        elseif v:IsA("MeshPart") then
+            v.TextureID = ""
+        end
+    end
+
+    -- Giảm đồ họa tổng thể
+    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+end)
+
+print("MZ HUB: Tự động xóa hiệu ứng, không xóa hoạt ảnh, đã bật chế độ giảm lag.")
