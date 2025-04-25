@@ -1,4 +1,4 @@
--- MZ HUB - Tự động xóa toàn bộ hiệu ứng, hoạt ảnh, tăng FPS
+1-- MZ HUB - Tự động xóa toàn bộ hiệu ứng, hoạt ảnh, tăng FPS
 
 pcall(function()
     -- Xóa hiệu ứng ánh sáng
@@ -30,15 +30,7 @@ pcall(function()
             v.TextureID = ""
         end
     end
-
-    -- Xóa hoạt ảnh của nhân vật
-    for _, player in pairs(game.Players:GetPlayers()) do
-        if player.Character and player.Character:FindFirstChild("Animate") then
-            player.Character.Animate:Destroy()
-        end
-    end
-
-    -- Giảm đồ họa tổng thể
+-- Giảm đồ họa tổng thể
     settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
 end)
 
