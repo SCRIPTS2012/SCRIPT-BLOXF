@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MXZ DPI Config</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      background: #00ffcc;
+      color: #111;
+      padding: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #00ffcc;
+    }
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+    }
+    .output {
+      background: #222;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    .label {
+      font-weight: bold;
+      color: #00ffcc;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">MXZ DPI - Tăng Nhạy Headshot Free Fire</div>
+  <div class="container">
+    <h1>MXZ DPI Config</h1>
+    <label class="label" for="device">Chọn loại máy:</label>
+    <select id="device">
+      <option value="low">Máy yếu (RAM < 3GB)</option>
+      <option value="mid">Máy tầm trung (RAM 4-6GB)</option>
+      <option value="high">Máy mạnh (RAM > 6GB)</option>
+    </select>
+    <button onclick="showConfig()">Xem cấu hình</button><div id="config" class="output" style="display:none;"></div>
+
+  </div>  <script>
+    function showConfig() {
+      const device = document.getElementById("device").value;
+      let dpi, sensitivity;
+
+      if (device === "low") {
+        dpi = "600–680";
+      } else if (device === "mid") {
+        dpi = "720–800";
+      } else {
+        dpi = "820–900";
+      }
+
+      sensitivity = `
+        <div><span class="label">DPI:</span> ${dpi}</div>
+        <div><span class="label">Độ nhạy:</span></div>
+        <ul>
+          <li>Tổng quan: 100</li>
+          <li>Red Dot: 100</li>
+          <li>2x Scope: 95</li>
+          <li>4x Scope: 90</li>
+          <li>AWM Scope: 70</li>
+          <li>Free Look: 85</li>
+        </ul>
+        <div><span class="label">Gợi ý HUD:</span> Nút bắn 55–65%, Scope ~60%, Joystick ~60%</div>
+      `;
+
+      const configDiv = document.getElementById("config");
+      configDiv.innerHTML = sensitivity;
+      configDiv.style.display = "block";
+    }
+  </script></body>
+</html>
