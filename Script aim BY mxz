@@ -1,0 +1,68 @@
+-- Script hỗ trợ bắn xuyên tường cho mọi vũ khí và mọi game
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+
+-- Kích hoạt xuyên tường cho mọi người chơi
+for _, p in pairs(Players:GetPlayers()) do
+    if p ~= LocalPlayer then
+        p.CharacterAdded:Connect(function(char)
+            -- Mở rộng hitbox của người chơi
+            RunService.RenderStepped:Connect(function()
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local hrp = char.HumanoidRootPart
+                    hrp.Size = Vector3.new(50, 50, 50)  -- Tăng kích thước hitbox
+                    hrp.Transparency = 0.8               -- Làm cho hitbox dễ thấy hơn
+                    hrp.CanCollide = false               -- Không va chạm với các vật thể khác
+                    hrp.Material = Enum.Material.ForceField
+                end
+            end)
+        end)
+    end
+end
+
+-- Áp dụng xuyên tường cho các part trong game
+RunService.Stepped:Connect(function()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("BasePart") and v.CanCollide == true and not v:IsDescendantOf(LocalPlayer.Character) then
+            v.CanCollide = false  -- Tắt va chạm với tất cả các part không phải của player
+        end
+    end
+end)
+
+-- Tìm player gần nhất
+local function getNearestPlayer()
+    local nearest = nil
+    local shortestDistance = math.huge
+
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            local pos = p.Character.HumanoidRootPart.Position
+            local distance = (Camera.CFrame.Position - pos).Magnitude
+            if distance < shortestDistance then
+                shortestDistance = distance
+                nearest = p
+            end
+        end
+    end
+
+    return nearest
+end
+
+-- Auto Aim tới player gần nhất
+RunService.RenderStepped:Connect(function()
+    local target = getNearestPlayer()
+    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+        local targetPos = target.Character.HumanoidRootPart.Position
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPos)
+    end
+end)
+
+-- Tự động phá vỡ va chạm của mọi vật thể trong game
+for _, part in pairs(workspace:GetDescendants()) do
+    if part:IsA("BasePart") then
+        part.CanCollide = false  -- Bỏ va chạm mọi vật thể trong môi trường
+    end
+end
