@@ -1,0 +1,29 @@
+-- Auto Block với Hitbox 50 cho The Stronger Battlegrounds (Không UI)
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+-- Tăng kích thước hitbox lên 50
+hrp.Size = Vector3.new(50, 50, 50)  -- Thay đổi kích thước hitbox thành 50
+hrp.CanCollide = false               -- Tắt va chạm với các đối tượng khác
+hrp.Transparency = 0.8               -- Làm cho hitbox dễ nhận diện hơn (trong suốt)
+
+-- Hàm tự động block khi bị tấn công
+local function autoBlock()
+    -- Kiểm tra khi sức khỏe giảm (bị tấn công)
+    local prevHealth = humanoid.Health
+    humanoid.HealthChanged:Connect(function(health)
+        if health < prevHealth then
+            -- Khi sức khỏe bị giảm, thực hiện hành động block tự động
+            print("Auto Block Activated!")
+            
+            -- Thực hiện block nếu có sự kiện block trong game
+            -- Ví dụ: game:GetService("ReplicatedStorage"):WaitForChild("BlockEvent"):FireServer()
+        end
+    end)
+end
+
+-- Bật auto block ngay khi vào game
+autoBlock()
