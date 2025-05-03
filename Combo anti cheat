@@ -1,0 +1,77 @@
+-- Gộp script Yetazyyy và Stick GUI
+
+-- Tải script từ Yetazyyy Hub
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Yetazyyy/YETAHUB/refs/heads/main/TSB.lua"))()
+
+-- Script tạo nút Stick Toggle
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Tạo RemoteEvent để giao tiếp server (nếu cần dùng server-side)
+if not ReplicatedStorage:FindFirstChild("StickToggleEvent") then
+    local stickToggleEvent = Instance.new("RemoteEvent")
+    stickToggleEvent.Name = "StickToggleEvent"
+    stickToggleEvent.Parent = ReplicatedStorage
+end
+
+-- Tạo GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "StickToggleGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 120, 0, 35)
+toggleButton.Position = UDim2.new(0, 10, 0, 10)
+toggleButton.Text = "Bám người gần nhất"
+toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.Parent = screenGui
+
+-- Biến hoạt động
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local stickEnabled = false
+local stickOffset = Vector3.new(0, -5, 0)
+
+-- Tìm người chơi gần nhất
+local function getClosestPlayer(position)
+    local closestPlayer = nil
+    local shortestDistance = math.huge
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            local distance = (p.Character.HumanoidRootPart.Position - position).magnitude
+            if distance < shortestDistance then
+                shortestDistance = distance
+                closestPlayer = p
+            end
+        end
+    end
+    return closestPlayer
+end
+
+-- Cập nhật vị trí
+local function updateCharacterPosition()
+    if stickEnabled then
+        local closestPlayer = getClosestPlayer(humanoidRootPart.Position)
+        if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local targetPosition = closestPlayer.Character.HumanoidRootPart.Position
+            local newPosition = targetPosition + stickOffset
+            humanoidRootPart.CFrame = CFrame.new(newPosition, newPosition + Vector3.new(0, 1, 0))
+        end
+    end
+end
+
+-- Nút toggle
+toggleButton.MouseButton1Click:Connect(function()
+    stickEnabled = not stickEnabled
+    local evt = ReplicatedStorage:FindFirstChild("StickToggleEvent")
+    if evt then
+        evt:FireServer(stickEnabled)
+    end
+end)
+
+-- Luôn cập nhật vị trí
+RunService.Heartbeat:Connect(updateCharacterPosition)
