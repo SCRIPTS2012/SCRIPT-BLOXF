@@ -1,0 +1,74 @@
+-- C00LGUi REAL: Revival Edition – Evon Ready
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "C00LGUi"
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Main frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 400, 0, 300)
+frame.Position = UDim2.new(0.5, -200, 0.5, -150)
+frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+frame.BorderSizePixel = 0
+frame.Parent = gui
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0.2, 0)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "⚠️ YOU HAVE BEEN HACKED BY TEAM C00LKIDD ⚠️"
+title.TextColor3 = Color3.fromRGB(255, 0, 0)
+title.Font = Enum.Font.Arcade
+title.TextScaled = true
+title.Parent = frame
+
+-- Troll Mode button
+local btn = Instance.new("TextButton")
+btn.Size = UDim2.new(0.5, 0, 0.2, 0)
+btn.Position = UDim2.new(0.25, 0, 0.7, 0)
+btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+btn.Text = "TROLL MODE"
+btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+btn.Font = Enum.Font.Code
+btn.TextScaled = true
+btn.Parent = frame
+
+btn.MouseButton1Click:Connect(function()
+    local args = {
+        [1] = "[C00LKIDD SYSTEM] You are now controlled.",
+        [2] = "All"
+    }
+    local chatEvent = game:GetService("ReplicatedStorage")
+        :WaitForChild("DefaultChatSystemChatEvents")
+        :WaitForChild("SayMessageRequest")
+    chatEvent:FireServer(unpack(args))
+end)
+
+-- GUI Rung (fake lag effect)
+spawn(function()
+    while gui.Parent do
+        frame.Position = UDim2.new(0.5, math.random(-3,3), 0.5, math.random(-3,3))
+        wait(0.05)
+    end
+end)
+
+-- Matrix code background (text-based)
+for i = 1, 40 do
+    local code = Instance.new("TextLabel")
+    code.Size = UDim2.new(0, 20, 0, 20)
+    code.Position = UDim2.new(0, math.random(0, 400), 0, math.random(60, 260))
+    code.BackgroundTransparency = 1
+    code.Text = math.random(0,1) == 1 and "1" or "0"
+    code.TextColor3 = Color3.fromRGB(0, 255, 0)
+    code.Font = Enum.Font.Code
+    code.TextSize = 18
+    code.ClipsDescendants = false
+    code.Parent = frame
+    spawn(function()
+        while gui.Parent do
+            code.Text = (math.random(0,1) == 1 and "1" or "0")
+            wait(math.random(0.1, 0.3))
+        end
+    end)
+end
