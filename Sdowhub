@@ -1,0 +1,101 @@
+--// SDowhub by ShadowVN Kaitou
+-- Key System: sdowhub
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "⚔️ SDowhub | Blox Fruits",
+    LoadingTitle = "SDowhub Loading...",
+    LoadingSubtitle = "by Kaitou",
+    ConfigurationSaving = {
+       Enabled = true,
+       FolderName = "SDowhub",
+       FileName = "BloxFruits"
+    },
+    Discord = {
+       Enabled = false,
+       Invite = "",
+       RememberJoins = true
+    },
+    KeySystem = true,
+    KeySettings = {
+       Title = "SDowhub Key System",
+       Subtitle = "Nhập key để dùng",
+       Note = "Key = sdowhub",
+       FileName = "SDowhubKey",
+       SaveKey = true,
+       GrabKeyFromSite = false,
+       Key = {"sdowhub"}
+    }
+})
+
+-- Tab
+local Main = Window:CreateTab("⚔️ Auto Farm", 4483362458)
+local Teleport = Window:CreateTab("🌍 Teleport", 4483362458)
+local Misc = Window:CreateTab("⚙️ Misc", 4483362458)
+
+-- Auto Farm Toggle
+local AutoFarm = false
+Main:CreateToggle({
+    Name = "Auto Farm Level",
+    CurrentValue = false,
+    Flag = "AutoFarmLevel",
+    Callback = function(Value)
+        AutoFarm = Value
+        while AutoFarm do task.wait()
+            pcall(function()
+                local plr = game.Players.LocalPlayer
+                local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                local target = game:GetService("Workspace").Enemies:FindFirstChildWhichIsA("Model")
+                if target and target:FindFirstChild("HumanoidRootPart") and hrp then
+                    hrp.CFrame = target.HumanoidRootPart.CFrame * CFrame.new(0,5,3)
+                    game:GetService("VirtualUser"):ClickButton1(Vector2.new())
+                end
+            end)
+        end
+    end,
+})
+
+-- Auto Buso Haki
+Main:CreateButton({
+    Name = "Bật Buso Haki",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Buso")
+    end,
+})
+
+-- Teleport Dropdown
+Teleport:CreateDropdown({
+    Name = "Dịch chuyển đảo",
+    Options = {"Starter Island", "Marine", "Jungle", "Sky Island"},
+    CurrentOption = {"Starter Island"},
+    Flag = "TPIsland",
+    Callback = function(Option)
+        local plr = game.Players.LocalPlayer
+        local hrp = plr.Character:WaitForChild("HumanoidRootPart")
+        if Option == "Starter Island" then
+            hrp.CFrame = CFrame.new(1100, 15, 1100)
+        elseif Option == "Marine" then
+            hrp.CFrame = CFrame.new(-2500, 20, 2200)
+        elseif Option == "Jungle" then
+            hrp.CFrame = CFrame.new(-1500, 20, 1000)
+        elseif Option == "Sky Island" then
+            hrp.CFrame = CFrame.new(-5000, 500, -1000)
+        end
+    end,
+})
+
+-- Misc
+Misc:CreateButton({
+    Name = "Anti AFK",
+    Callback = function()
+        local vu = game:GetService("VirtualUser")
+        game:GetService("Players").LocalPlayer.Idled:Connect(function()
+            vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+            task.wait(1)
+            vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+        end)
+    end,
+})
+
+Rayfield:LoadConfiguration()
