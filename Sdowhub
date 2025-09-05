@@ -1,48 +1,76 @@
---// SDowHub Dream Ultimate Full (Melee + Full Teleport) by ShadowVN Kaitou
--- Key System: sdowhub
+-- SDowHub - Fixes + safer version (Melee auto farm + PvP aim)
+-- Key = "sdowhub"
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- safe Rayfield load
+local ok, Rayfield = pcall(function()
+    return loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+end)
+if not ok or not Rayfield then
+    warn("Rayfield load failed, aborting script.")
+    return
+end
+
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
 local VirtualUser = game:GetService("VirtualUser")
 
--- GUI
+local LocalPlayer = Players.LocalPlayer
+if not LocalPlayer then
+    warn("LocalPlayer not available.")
+    return
+end
+
+-- safe access to CommF_ remote
+local CommF = (ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("CommF_")) or ReplicatedStorage:FindFirstChild("CommF_")
+local function safeInvokeRemote(name, ...)
+    if not CommF or type(CommF.InvokeServer) ~= "function" then
+        -- try refresh path
+        CommF = (ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage.Remotes:FindFirstChild("CommF_")) or ReplicatedStorage:FindFirstChild("CommF_")
+        if not CommF then
+            -- silently return
+            return nil
+        end
+    end
+    local suc, res = pcall(function()
+        return CommF:InvokeServer(name, ...)
+    end)
+    if not suc then
+        warn("Remote invoke failed:", name, res)
+        return nil
+    end
+    return res
+end
+
+-- GUI window
 local Window = Rayfield:CreateWindow({
-    Name = "⚔️ SDowHub Dream Ultimate | Blox Fruits",
-    LoadingTitle = "SDowHub Dream Loading...",
-    LoadingSubtitle = "by ShadowVN Kaitou",
+    Name = "⚔️ SDowHub Fixed | Blox Fruits",
+    LoadingTitle = "SDowHub Loading...",
+    LoadingSubtitle = "Fixed by assistant",
     ConfigurationSaving = { Enabled = true, FolderName = "SDowHub", FileName = "BloxFruits" },
     KeySystem = true,
     KeySettings = { Title = "SDowHub Key", Subtitle = "Nhập key", Note = "Key = sdowhub", FileName = "SDowHubKey", SaveKey = true, GrabKeyFromSite = false, Key = {"sdowhub"} }
 })
 
--- Tabs
+-- tabs
 local Main = Window:CreateTab("⚔️ Auto Farm", 4483362458)
 local Teleport = Window:CreateTab("🌍 Teleport", 4483362458)
 local Misc = Window:CreateTab("⚙️ Misc", 4483362458)
 
--- Variables
+-- state
 local AutoFarmEnabled, AutoQuestEnabled, AutoBossEnabled, AutoDFEnabled, AutoLevelEnabled = false,false,false,false,false
-local AimEnabled, AimRadius, TargetPlayer = false,50,nil
+local AimEnabled, AimRadius = false, 50
+local farmRunning = false
 
--- SEA DATA
+-- Sea & islands (you can adjust coords)
 local QuestData = {
-    ["Sea1"] = { NPC=Vector3.new(100,0,100), Quests={{Mob="Bandit [Lv. 5]",Amount=10},{Mob="Monkey [Lv. 14]",Amount=12}}, Boss={"Bandit Leader [Lv. 50]"}, Mobs={"Bandit [Lv. 5]","Monkey [Lv. 14]"} },
-    ["Sea2"] = { NPC=Vector3.new(-500,0,200), Quests={{Mob="Pirate [Lv. 20]",Amount=15},{Mob="Brute [Lv. 35]",Amount=10}}, Boss={"Pirate Captain [Lv. 100]"}, Mobs={"Pirate [Lv. 20]","Brute [Lv. 35]"} },
-    ["Sea3"] = { NPC=Vector3.new(200,0,-300), Quests={{Mob="Marine Captain [Lv. 40]",Amount=15},{Mob="Fishman Warrior [Lv. 50]",Amount=12}}, Boss={"Marine Admiral [Lv. 200]"}, Mobs={"Marine Captain [Lv. 40]","Fishman Warrior [Lv. 50]"} }
+    ["Sea1"] = { NPC=Vector3.new(1100,15,1100), Mobs={"Bandit","Monkey"}, Boss={"Bandit Leader"} },
+    ["Sea2"] = { NPC=Vector3.new(-2500,20,2200), Mobs={"Pirate","Brute"}, Boss={"Pirate Captain"} },
+    ["Sea3"] = { NPC=Vector3.new(-1500,20,1000), Mobs={"Marine Captain","Fishman Warrior"}, Boss={"Marine Admiral"} }
 }
 
-local function getSea(level)
-    if level < 50 then return "Sea1"
-    elseif level < 150 then return "Sea2"
-    else return "Sea3"
-end
-
--- Islands Full Teleport
 local Islands = {
     ["Starter Island"] = Vector3.new(1100,15,1100),
     ["Marine"] = Vector3.new(-2500,20,2200),
@@ -54,169 +82,51 @@ local Islands = {
     ["Revolutionary"] = Vector3.new(-3500,50,3500),
     ["Colosseum"] = Vector3.new(0,20,0),
     ["Underwater City"] = Vector3.new(4500,-50,1000),
-    ["Frozen Village"] = Vector3.new(-5000,20,2500),
-    ["Pirate Island"] = Vector3.new(3200,20,-1500),
-    ["Sky Fortress"] = Vector3.new(-4500,600,-1000),
-    ["Hidden Island"] = Vector3.new(6000,50,2000)
+    ["Pirate Island"] = Vector3.new(3200,20,-1500)
 }
 
--- Helper functions
-local function getNearestEnemy(names)
-    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return nil end
-    local nearest,minDist = nil,math.huge
-    for _,v in pairs(Workspace.Enemies:GetChildren()) do
-        if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and table.find(names,v.Name) then
-            local dist = (v.HumanoidRootPart.Position - hrp.Position).Magnitude
-            if dist<minDist then nearest=v minDist=dist end
+-- helpers
+local function safeGetLevel()
+    local success, level = pcall(function()
+        if LocalPlayer:FindFirstChild("Data") and LocalPlayer.Data:FindFirstChild("Level") then
+            return LocalPlayer.Data.Level.Value
         end
-    end
-    return nearest
-end
-
-local function getNearestDF()
-    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return nil end
-    local nearest,minDist = nil,math.huge
-    for _,v in pairs(Workspace:GetChildren()) do
-        if v:IsA("Tool") and v.Name:find("Fruit") then
-            local dist = (v.Position - hrp.Position).Magnitude
-            if dist<minDist then nearest=v minDist=dist end
-        end
-    end
-    return nearest
-end
-
-local function TweenTo(hrp,pos)
-    local distance = (hrp.Position-pos).Magnitude
-    local tweenInfo = TweenInfo.new(distance/150,Enum.EasingStyle.Linear,Enum.EasingDirection.Out)
-    local tween = TweenService:Create(hrp,tweenInfo,{CFrame=CFrame.new(pos+Vector3.new(0,5,0))})
-    tween:Play()
-    tween.Completed:Wait()
-end
-
--- Auto Farm Melee + Quest + Boss + Devil Fruit + Auto Buso
-local function AutoFarmMelee()
-    spawn(function()
-        while AutoFarmEnabled do task.wait(0.1)
-            pcall(function()
-                local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                if not hrp then return end
-                local level = LocalPlayer.Data.Level.Value
-                local Sea = getSea(level)
-                local data = QuestData[Sea]
-
-                -- Auto Quest
-                if AutoQuestEnabled then
-                    TweenTo(hrp,data.NPC)
-                    ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest")
-                    task.wait(math.random(1,2))
-                end
-
-                -- Auto Mob Melee
-                local target = getNearestEnemy(data.Mobs)
-                if target and target:FindFirstChild("HumanoidRootPart") then
-                    while target.Humanoid.Health > 0 and AutoFarmEnabled do
-                        TweenTo(hrp,target.HumanoidRootPart.Position)
-                        VirtualUser:ClickButton1(Vector2.new())
-                        task.wait(math.random(0.15,0.35))
-                    end
-                end
-
-                -- Auto Boss Melee
-                if AutoBossEnabled then
-                    local bossTarget = getNearestEnemy(data.Boss)
-                    if bossTarget and bossTarget:FindFirstChild("HumanoidRootPart") then
-                        while bossTarget.Humanoid.Health > 0 and AutoFarmEnabled do
-                            TweenTo(hrp,bossTarget.HumanoidRootPart.Position)
-                            VirtualUser:ClickButton1(Vector2.new())
-                            task.wait(math.random(0.2,0.4))
-                        end
-                    end
-                end
-
-                -- Auto Devil Fruit
-                if AutoDFEnabled then
-                    local df = getNearestDF()
-                    if df then TweenTo(hrp,df.Position) task.wait(0.2) df.Parent = LocalPlayer.Backpack end
-                end
-
-                -- Auto Level Skill & Buso
-                if AutoLevelEnabled then
-                    pcall(function()
-                        ReplicatedStorage.Remotes.CommF_:InvokeServer("UpgradeSkill")
-                        ReplicatedStorage.Remotes.CommF_:InvokeServer("UpgradeBuso")
-                    end)
-                end
-
-                -- Auto Buso
-                pcall(function()
-                    ReplicatedStorage.Remotes.CommF_:InvokeServer("Buso")
-                end)
-            end)
-        end
+        return 0
     end)
+    if success then return level or 0 end
+    return 0
 end
 
--- GUI Toggles
-Main:CreateToggle({ Name="Auto Farm Melee Sea 1→3", CurrentValue=false, Flag="AutoFarmMelee", Callback=function(V)
-    AutoFarmEnabled=V
-    if AutoFarmEnabled then AutoFarmMelee() end
-end })
-Main:CreateToggle({ Name="Auto Quest", CurrentValue=false, Flag="AutoQuest", Callback=function(V) AutoQuestEnabled=V end })
-Main:CreateToggle({ Name="Auto Boss Sea 1→3", CurrentValue=false, Flag="AutoBoss", Callback=function(V) AutoBossEnabled=V end })
-Main:CreateToggle({ Name="Auto Devil Fruit", CurrentValue=false, Flag="AutoDF", Callback=function(V) AutoDFEnabled=V end })
-Main:CreateToggle({ Name="Auto Level Up Skill & Buso", CurrentValue=false, Flag="AutoLevel", Callback=function(V) AutoLevelEnabled=V end })
-
--- Teleport Dropdown Full đảo
-Teleport:CreateDropdown({
-    Name = "Dịch chuyển đảo",
-    Options = (function() local t={} for k,_ in pairs(Islands) do table.insert(t,k) end return t end)(),
-    CurrentOption = {"Starter Island"},
-    Flag = "TPIsland",
-    Callback = function(Option)
-        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if hrp and Islands[Option] then hrp.CFrame = CFrame.new(Islands[Option]) end
+local function getSea(level)
+    if level < 50 then return "Sea1"
+    elseif level < 150 then return "Sea2"
+    else return "Sea3"
     end
-})
+end
 
--- Anti AFK
-Misc:CreateButton({ Name="Anti AFK", Callback=function()
-    LocalPlayer.Idled:Connect(function()
-        VirtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-        task.wait(1)
-        VirtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-    end)
-end })
-
--- PvP Aim
-Main:CreateToggle({ Name = "Aim Player PvP", CurrentValue = false, Flag = "AimPlayer", Callback = function(Value) AimEnabled = Value end })
-Main:CreateSlider({ Name = "Aim Radius", Range = {10,100}, Increment = 1, Suffix = " studs", CurrentValue = 50, Flag = "AimRadiusSlider", Callback = function(Value) AimRadius = Value end })
-
-RunService.RenderStepped:Connect(function()
-    if AimEnabled then
-        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-        local nearestPlayer,minDist = nil,math.huge
-        for _,plr in pairs(Players:GetPlayers()) do
-            if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Health>0 then
-                local dist = (plr.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
-                if dist < minDist and dist <= AimRadius then
-                    minDist = dist
-                    nearestPlayer = plr
-                end
+local function findEnemiesList()
+    -- return a list-like table of candidate enemy models
+    if Workspace:FindFirstChild("Enemies") then
+        return Workspace.Enemies:GetChildren()
+    else
+        -- fallback: any Model under workspace that has Humanoid and HumanoidRootPart
+        local out = {}
+        for _,v in pairs(Workspace:GetDescendants()) do
+            if v:IsA("Model") and v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") then
+                table.insert(out, v)
             end
         end
-        TargetPlayer = nearestPlayer
-        if TargetPlayer and TargetPlayer.Character and TargetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            hrp.CFrame = CFrame.new(hrp.Position, TargetPlayer.Character.HumanoidRootPart.Position)
-            pcall(function()
-                VirtualUser:ClickButton1(Vector2.new())
-                ReplicatedStorage.Remotes.CommF_:InvokeServer("UseSkill")
-            end)
-        end
+        return out
     end
-end)
+end
 
-Rayfield:LoadConfiguration()
-print("⚔️ SDowHub Dream Ultimate Loaded | By ShadowVN Kaitou")
+local function getNearestEnemyByNames(names)
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return nil end
+    local nearest, minDist = nil, math.huge
+    for _,v in pairs(findEnemiesList()) do
+        if v and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
+            -- matching by partial name to be more robust (e.g. "Bandit [Lv. 5]" -> "Bandit")
+            for _,n in ipairs(names) do
+                if type(v.Name) == "string" and string.find(v.Name, n) then
+                    local dist =
