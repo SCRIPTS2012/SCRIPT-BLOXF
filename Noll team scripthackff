@@ -1,275 +1,108 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>System Security Scan</title>
-<style>
-  /* Reset */
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; overflow: hidden; background: black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, monospace; color: #fff; }
-
-  /* Canvas ma trận */
-  canvas#matrix { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; display: block; }
-
-  /* Thông báo virus chớp nháy */
-  .virus-alert {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    background: #ff0000; color: white; font-size: 24px; font-weight: bold;
-    padding: 15px 30px; border-radius: 10px; box-shadow: 0 0 20px #ff0000;
-    z-index: 2000; animation: flash 1.5s infinite; user-select: none;
-  }
-  @keyframes flash { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-  /* Chữ RAIN MATRIX */
-  #rainMatrixText {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-size: 5vw; font-weight: bold; color: #0F0;
-    text-shadow: 0 0 5px #0F0,0 0 10px #0F0,0 0 20px #0F0,0 0 40px #0F0;
-    animation: blink 1.5s infinite; z-index: 1; user-select: none;
-  }
-  @keyframes blink { 0%,50%,100% { opacity: 1 } 25%,75% { opacity: 0.2 } }
-
-  /* Container chính prank */
-  .container {
-    max-width: 900px; margin: 50px auto; background: rgba(0,0,0,0.85);
-    border-radius: 15px; padding: 30px; box-shadow: 0 0 50px rgba(255,0,0,0.3);
-    border: 2px solid #ff4444; position: relative; z-index: 10;
-  }
-  .header { text-align: center; margin-bottom: 30px; }
-  .header h1 { color: #ff4444; font-size: 28px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(255,0,0,0.5); }
-  .scan-area { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-
-  .progress-container { background: rgba(255,255,255,0.05); border-radius: 10px; height: 36px; margin: 20px 0; overflow: hidden; }
-  .progress-bar { height: 100%; background: linear-gradient(90deg,#ff4444 0%,#ff6666 100%); width: 0%; transition: width 0.5s ease; border-radius: 10px; }
-
-  .threat-list { margin: 20px 0; }
-  .threat-item { background: rgba(255,0,0,0.12); padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #ff4444; color: #fff; }
-  .threat-item.critical { background: rgba(255,0,0,0.2); border-left: 4px solid #ff0000; }
-
-  .buttons { display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-  button { padding: 14px 26px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: transform .15s ease; }
-  .remove-btn { background: linear-gradient(135deg,#ff4444 0%,#cc0000 100%); color: white; }
-  .ignore-btn { background: rgba(255,255,255,0.08); color: #ccc; }
-  .exit-btn { background: #333; color: #fff; border: 1px solid #666; }
-
-  .warning { text-align:center; color:#ff6666; font-size:14px; margin-top:18px; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.7 } }
-
-  /* Popup giả */
-  .fake-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 30px rgba(0,0,0,0.6); z-index: 3000; display: none; min-width: 280px; }
-  .fake-popup.active { display: block; animation: shake 0.45s ease-in-out; }
-  @keyframes shake {
-    0%,100% { transform: translate(-50%,-50%) rotate(0deg) }
-    25% { transform: translate(-50%,-50%) rotate(4deg) }
-    75% { transform: translate(-50%,-50%) rotate(-4deg) }
-  }
-  .fake-popup button { margin-top: 12px; }
-
-  /* Scrolling text */
-  #scrollingTextContainer { position: fixed; bottom: 0; width: 100%; height: 40px; background: rgba(0,0,0,0.7); overflow: hidden; z-index: 20; user-select: none; }
-  #scrollingText { white-space: nowrap; color: #0F0; font-size: 24px; font-weight: bold; padding-left: 100%; font-family: monospace; text-shadow: 0 0 5px #0F0,0 0 10px #0F0; animation: scrollLeft 10s linear infinite; }
-  @keyframes scrollLeft { 0% { transform: translateX(0%);} 100% { transform: translateX(-100%);} }
-
-  /* Small responsive */
-  @media (max-width:600px) {
-    .container { margin: 20px; padding: 18px; }
-    #rainMatrixText { font-size: 11vw; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>⚠️ Critical System Alert ⚠️</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    h1 {
+      font-size: 40px;
+      color: #ff0000;
+      text-shadow: 0 0 15px #ff0000;
+      margin: 20px 0;
+    }
+    .virus-box {
+      border: 2px solid red;
+      padding: 15px;
+      width: 80%;
+      max-width: 500px;
+      background: #220000;
+      margin: 10px auto;
+      color: white;
+    }
+  </style>
 </head>
 <body>
-
-<canvas id="matrix"></canvas>
-
-<div class="virus-alert" id="virusAlert">⚠️ Bạn đã dính virus! ⚠️</div>
-
-<div id="rainMatrixText">RAIN MATRIX</div>
-
-<div class="container" id="prankContainer" role="main" aria-live="assertive">
-  <div class="header">
-    <h1>⚠️ CRITICAL SYSTEM ALERT ⚠️</h1>
-    <p>Windows Security has detected multiple severe threats</p>
-  </div>
-
-  <div class="scan-area">
-    <h3>Scanning system files...</h3>
-    <div class="progress-container" aria-hidden="false">
-      <div class="progress-bar" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
-    </div>
-
-    <div class="threat-list">
-      <div class="threat-item critical"><strong>Trojan:Win32/Malware.A!rfn</strong> - System critical area</div>
-      <div class="threat-item"><strong>PUA:Win32/UnwantedSoftware.B</strong> - Browser extensions</div>
-      <div class="threat-item critical"><strong>Ransomware:Win32/CryptoLocker.C</strong> - Documents folder</div>
-      <div class="threat-item"><strong>Adware:Win32/PopUnder.D</strong> - System registry</div>
+  <canvas id="matrix"></canvas>
+  <div class="overlay">
+    <h1>⚠️ SYSTEM CRITICAL ERROR ⚠️</h1>
+    <div class="virus-box">
+      Máy tính của bạn đã bị nhiễm virus!<br>
+      Không thể thoát ra ngoài!<br>
+      Tất cả dữ liệu đang bị khóa!
     </div>
   </div>
 
-  <div class="buttons">
-    <button class="remove-btn" id="removeBtn">REMOVE ALL THREATS</button>
-    <button class="ignore-btn" id="ignoreBtn">IGNORE (NOT RECOMMENDED)</button>
-    <button class="exit-btn" id="exitBtn">EXIT</button>
-  </div>
+  <script>
+    // Matrix effect
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
 
-  <div class="warning">⚠️ Immediate action required! Your system is at risk of data loss and identity theft.</div>
-</div>
+    const letters = "01YOUAREIDIOT".split("");
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+    for (let x = 0; x < columns; x++) drops[x] = 1;
 
-<div class="fake-popup" id="fakePopup" role="dialog" aria-modal="true" aria-hidden="true">
-  <h3 id="popupTitle">System Error</h3>
-  <p id="popupText">Cannot remove threats. System integrity compromised.</p>
-  <div style="display:flex; gap:8px; justify-content:flex-end;">
-    <button id="popupClose">CLOSE</button>
-  </div>
-</div>
+    function draw() {
+      ctx.fillStyle = "rgba(0,0,0,0.05)";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = "#0F0";
+      ctx.font = fontSize + "px arial";
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random()*letters.length)];
+        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+        if (drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    }
+    setInterval(draw, 33);
 
-<div id="scrollingTextContainer"><div id="scrollingText">ib Noll team để mở khóa • ib Noll team để mở khóa • </div></div>
+    // Phát nhạc prank
+    const audio = new Audio("youareidots.mp3");
+    audio.loop = true;
+    audio.volume = 0.0; 
+    audio.play();
 
-<script>
-/* ========== MATRIX EFFECT ========== */
-const canvas = document.getElementById('matrix');
-const ctx = canvas.getContext('2d');
-let W = canvas.width = window.innerWidth;
-let H = canvas.height = window.innerHeight;
-const chars = 'アァカサタナハマヤャラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*+-=<>';
+    // Tăng volume dần
+    let volume = 0.0;
+    const fadeInterval = setInterval(() => {
+      if (volume < 1.0) {
+        volume += 0.01;
+        audio.volume = Math.min(volume, 1.0);
+      } else {
+        clearInterval(fadeInterval);
+      }
+    }, 200);
 
-const fontSize = 16;
-let cols = Math.floor(W / fontSize);
-let drops = [];
-for (let i = 0; i < cols; i++) drops[i] = Math.random() * H;
-
-function drawMatrix() {
-  ctx.fillStyle = 'rgba(0,0,0,0.05)';
-  ctx.fillRect(0,0,W,H);
-  ctx.fillStyle = '#0F0';
-  ctx.font = fontSize + 'px monospace';
-  for (let i = 0; i < drops.length; i++) {
-    const text = chars.charAt(Math.floor(Math.random() * chars.length));
-    ctx.fillText(text, i*fontSize, drops[i]*fontSize);
-    if (drops[i]*fontSize > H && Math.random() > 0.975) drops[i] = 0;
-    drops[i]++;
-  }
-  requestAnimationFrame(drawMatrix);
-}
-drawMatrix();
-
-window.addEventListener('resize', () => {
-  W = canvas.width = window.innerWidth;
-  H = canvas.height = window.innerHeight;
-  cols = Math.floor(W / fontSize);
-  drops = [];
-  for (let i = 0; i < cols; i++) drops[i] = Math.random() * H;
-});
-
-/* ========== PROGRESS BAR SIM ========= */
-const progressBar = document.getElementById('progressBar');
-let prog = 0;
-const progSteps = [5, 18, 35, 48, 62, 74, 86, 95, 100];
-function stepProgress() {
-  if (prog >= 100) return;
-  prog = progSteps[Math.floor(Math.random() * progSteps.length)];
-  progressBar.style.width = prog + '%';
-  progressBar.setAttribute('aria-valuenow', prog);
-  if (prog < 100) setTimeout(stepProgress, 900 + Math.random()*1500);
-  else {
-    // final: show popup after short delay to simulate fail
-    setTimeout(() => showPopup('Removal Failed', 'Automatic removal failed. Manual intervention required.'), 900);
-  }
-}
-setTimeout(stepProgress, 800);
-
-/* ========== POPUP HANDLING (SAFE) ========== */
-const fakePopup = document.getElementById('fakePopup');
-const popupTitle = document.getElementById('popupTitle');
-const popupText = document.getElementById('popupText');
-const popupClose = document.getElementById('popupClose');
-
-function showPopup(title, text) {
-  popupTitle.textContent = title;
-  popupText.textContent = text;
-  fakePopup.classList.add('active');
-  fakePopup.setAttribute('aria-hidden', 'false');
-  // focus close button for accessibility
-  popupClose.focus();
-}
-
-function closePopup() {
-  fakePopup.classList.remove('active');
-  fakePopup.setAttribute('aria-hidden', 'true');
-}
-
-/* Buttons: show popup, but allow closing */
-document.getElementById('removeBtn').addEventListener('click', () => {
-  showPopup('Removal Failed', 'Some threats could not be removed automatically. Please backup your data.');
-});
-document.getElementById('ignoreBtn').addEventListener('click', () => {
-  showPopup('Warning', 'Ignoring threats is not recommended. Data loss risk remains.');
-});
-document.getElementById('exitBtn').addEventListener('click', () => {
-  // friendly exit: allow user to go back or close tab
-  // We provide a clear close action: close popup if open, otherwise navigate to about:blank
-  closePopup();
-  try { window.location.href = 'about:blank'; } catch(e) { /* noop */ }
-});
-popupClose.addEventListener('click', closePopup);
-
-/* ========== SAFE NAVIGATION GUARDS ========== */
-/* We will push a history state so that accidental back button doesn't immediately leave.
-   This is non-malicious: user can still exit via Exit button or browser controls.
-*/
-function pushSafeState() {
-  try {
-    history.pushState({prank: true}, '', location.href);
-  } catch(e){}
-}
-pushSafeState();
-window.addEventListener('popstate', (e) => {
-  // when user presses back, show popup instead of immediate leave
-  showPopup('Navigation Intercepted', 'Press EXIT button to leave the page safely.');
-  // push state again so user remains on this page unless they use EXIT
-  pushSafeState();
-});
-
-/* block common keys that might close overlays like ESC - but do NOT block Ctrl+W or Alt+F4 */
-window.addEventListener('keydown', (e) => {
-  // only intercept Escape to show a message (not to prevent closing browser)
-  if (e.key === 'Escape') {
-    e.preventDefault();
-    showPopup('Action blocked', 'Press the EXIT button below to leave.');
-  }
-});
-
-/* disable right-click to increase 'prank' feel */
-window.addEventListener('contextmenu', (e) => e.preventDefault());
-
-/* prevent accidental unload by showing a confirm dialog (browser may show its own message) */
-window.addEventListener('beforeunload', function (e) {
-  // show a confirmation so user doesn't close unintentionally; browser will show default message
-  e.preventDefault();
-  e.returnValue = '';
-});
-
-/* Accessibility: allow focusing Close with Tab */
-popupClose.tabIndex = 0;
-
-/* Optional: on first user interaction request fullscreen (browser requires gesture).
-   This makes the prank more dramatic but leaves user able to exit via Exit button or browser UI.
-*/
-let requestedFullscreen = false;
-function tryFullscreen() {
-  if (requestedFullscreen) return;
-  requestedFullscreen = true;
-  const el = document.documentElement;
-  if (el.requestFullscreen) {
-    el.requestFullscreen().catch(()=>{});
-  } else if (el.webkitRequestFullscreen) {
-    el.webkitRequestFullscreen();
-  }
-}
-// request fullscreen on first click/touch to enhance effect
-['click','touchstart'].forEach(ev => {
-  window.addEventListener(ev, tryFullscreen, { once: true, passive: true });
-});
-</script>
+    // Chặn thoát + tự mở lại
+    window.onbeforeunload = function(e) {
+      e.preventDefault();
+      e.returnValue = "⚠️ Hệ thống đang bị virus! Không thể thoát!";
+      setTimeout(() => {
+        window.open(window.location.href, "_blank");
+      }, 100);
+    };
+  </script>
 </body>
 </html>
