@@ -1,108 +1,337 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>⚠️ Critical System Alert ⚠️</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-    }
-    canvas {
-      display: block;
-    }
-    .overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    h1 {
-      font-size: 40px;
-      color: #ff0000;
-      text-shadow: 0 0 15px #ff0000;
-      margin: 20px 0;
-    }
-    .virus-box {
-      border: 2px solid red;
-      padding: 15px;
-      width: 80%;
-      max-width: 500px;
-      background: #220000;
-      margin: 10px auto;
-      color: white;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RANSOMWARE ALERT — Prank Demo (Safe, 30s)</title>
+<style>
+  :root{--red:#ff2b2b;--glass:rgba(255,255,255,0.02);--muted:rgba(255,255,255,0.06)}
+  html,body{height:100%;margin:0;background:#000;font-family:Consolas,monospace;color:#fff}
+  canvas#matrix{position:fixed;inset:0;z-index:0;display:block}
+  .ransom{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;
+    background:linear-gradient(180deg,rgba(0,0,0,0.6),rgba(0,0,0,0.85));padding:20px}
+  .card{width:min(1100px,96%);background:linear-gradient(180deg,#120000,#0b0000);border:3px solid var(--red);
+    border-radius:12px;padding:20px;box-shadow:0 10px 50px rgba(0,0,0,0.7)}
+  .head{display:flex;gap:16px;align-items:flex-start}
+  .title h1{color:var(--red);margin:0;font-size:28px;text-shadow:0 0 18px #ff4444}
+  .subtitle{color:#ffb3b3;margin-top:6px;font-size:13px}
+  .body{display:grid;grid-template-columns:1fr 460px;gap:18px;margin-top:18px}
+  .left{padding:12px;background:var(--glass);border-radius:8px;border:1px solid rgba(255,0,0,0.06)}
+  .files-wrap{max-height:360px;overflow:auto;padding-right:6px}
+  .file-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:8px}
+  .file-icon{width:48px;height:48px;background:linear-gradient(180deg,#222,#111);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+  .file-meta{flex:1;display:flex;flex-direction:column;gap:6px}
+  .file-name{font-family:monospace;font-size:13px}
+  .file-progress{height:8px;background:rgba(255,255,255,0.03);border-radius:6px;overflow:hidden}
+  .file-progress > b{display:block;height:100%;width:0%;background:linear-gradient(90deg,#ff4444,#ff9966)}
+  .file-status{font-size:12px;color:#ffb3b3;white-space:nowrap;margin-left:8px}
+  .right{padding:12px;background:var(--glass);border-radius:8px;border:1px solid rgba(255,0,0,0.06);display:flex;flex-direction:column;gap:12px}
+  .countdown{font-size:48px;color:var(--red);font-weight:900;text-align:center}
+  .wallet{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;border:1px dashed rgba(255,0,0,0.08);font-family:monospace;font-size:13px}
+  .hexbox{height:140px;background:#030303;color:#0f0;padding:10px;border-radius:6px;overflow:auto;font-family:monospace;font-size:12px;border:1px solid rgba(0,255,0,0.04)}
+  .controls{display:flex;gap:8px;justify-content:center}
+  .btn{padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:800}
+  .confirm{background:var(--red);color:#fff}
+  .exit{background:#222;color:#fff;border:1px solid #444}
+  .mute{background:#111;color:#fff;border:1px solid #333}
+  .paybox{margin-top:10px;background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.02)}
+  .pay-amount{font-size:20px;font-weight:900;color:#ffd6a6}
+  .small{font-size:12px;color:#ddd}
+  .toast{position:fixed;right:18px;bottom:18px;background:#0b0;color:#012;padding:10px 14px;border-radius:8px;z-index:9999}
+  .hidden{display:none}
+  .panic{box-shadow:0 0 30px rgba(255,0,0,0.6); border-color:#fff}
+  .shake{animation:shakeScreen .08s linear infinite}
+  @keyframes shakeScreen{0%{transform:translate(0,0)}25%{transform:translate(2px,-2px)}50%{transform:translate(-2px,2px)}75%{transform:translate(2px,2px)}100%{transform:translate(0,0)}}
+  .disclaimer{position:fixed;left:12px;bottom:12px;background:rgba(0,0,0,0.6);padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);font-size:12px;color:#ffd6a6;z-index:9999}
+  /* Hidden exit button at bottom-right */
+  #hiddenExit { position: fixed; bottom: 6px; right: 6px; width: 36px; height: 36px; opacity: 0; z-index: 99999; cursor: pointer; }
+  @media(max-width:1000px){ .body{grid-template-columns:1fr} .right{order:-1} .countdown{font-size:36px} }
+</style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
-  <div class="overlay">
-    <h1>⚠️ SYSTEM CRITICAL ERROR ⚠️</h1>
-    <div class="virus-box">
-      Máy tính của bạn đã bị nhiễm virus!<br>
-      Không thể thoát ra ngoài!<br>
-      Tất cả dữ liệu đang bị khóa!
+
+<canvas id="matrix"></canvas>
+
+<div class="ransom" role="dialog" aria-modal="true" aria-live="assertive">
+  <div class="card" id="card">
+    <div class="head">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none"><path d="M12 2v6" stroke="#ff4444" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="14" r="6" stroke="#ff4444" stroke-width="1.6" /></svg>
+      <div class="title">
+        <h1>YOUR FILES ARE ENCRYPTED</h1>
+        <div class="subtitle">Tất cả file quan trọng đã bị mã hóa. <strong>Đây CHỈ LÀ PRANK</strong> — Bấm CONFIRM hoặc EXIT để dừng.</div>
+      </div>
     </div>
+
+    <div class="body">
+      <div class="left">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-weight:800">Files encrypted (demo)</div>
+          <div style="font-size:12px;color:#ddd">Status: <span id="globalStatus">Encrypting</span></div>
+        </div>
+        <div class="files-wrap" id="filesWrap"></div>
+        <div style="margin-top:12px;font-size:13px;color:#ffb3b3">Note: đây là bản demo prank — không có file thực sự bị hỏng.</div>
+      </div>
+
+      <div class="right" id="rightPanel">
+        <div style="text-align:center">
+          <div id="countdown" class="countdown">00:30</div>
+          <div style="margin-top:6px;color:#ffb3b3;font-size:13px">Time left before "permanent encryption" — demo only</div>
+        </div>
+
+        <div class="wallet" aria-hidden="false">
+          <div style="font-size:12px;color:#ffb3b3;margin-bottom:6px"><strong>Payment required (demo):</strong></div>
+          <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+            <div style="font-family:monospace;font-size:15px">Amount: <span class="pay-amount" id="payAmount">$100</span></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px">
+            <div style="font-family:monospace;font-size:13px">BTC Wallet: <span id="wallet">1F3kXc...EXAMPLE</span></div>
+            <div style="display:flex;gap:6px">
+              <button class="btn" id="copyWallet" style="background:#222;color:#fff;border:1px solid #444">COPY</button>
+            </div>
+          </div>
+          <div class="small" style="margin-top:8px">Amount shown is a demo: <strong>$100</strong>. <em>DO NOT</em> send real money.</div>
+
+          <div class="paybox" id="payBox">
+            <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+              <button class="btn confirm" id="paidBtn">I PAID (SIMULATE)</button>
+              <button class="btn exit" id="verifyBtn">VERIFY PAYMENT (SIM)</button>
+            </div>
+            <div id="payStatus" class="small" style="margin-top:8px">No payment detected.</div>
+            <div id="txId" class="small hidden" style="margin-top:6px;font-family:monospace;color:#ffd6a6"></div>
+          </div>
+        </div>
+
+        <div class="hexbox" id="hexbox" aria-hidden="false"></div>
+
+        <div class="controls">
+          <button class="btn confirm" id="confirmBtn">CONFIRM (END PRANK)</button>
+          <button class="btn exit" id="exitBtn">EXIT</button>
+          <button class="btn mute" id="muteBtn">MUTE</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;text-align:center;color:rgba(255,255,255,0.12);font-size:12px">Ransomware-style prank • Demo only • Always provide clear exit</div>
   </div>
+</div>
 
-  <script>
-    // Matrix effect
-    const canvas = document.getElementById("matrix");
-    const ctx = canvas.getContext("2d");
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
+<div class="disclaimer">THIS IS A HARMLESS DEMO / PRANK — NO REAL PAYMENT, NO DATA LOSS</div>
 
-    const letters = "01YOUAREIDIOT".split("");
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = [];
-    for (let x = 0; x < columns; x++) drops[x] = 1;
+<!-- hidden exit button bottom-right -->
+<div id="hiddenExit" title="Hidden exit (click to stop prank)"></div>
 
-    function draw() {
-      ctx.fillStyle = "rgba(0,0,0,0.05)";
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = "#0F0";
-      ctx.font = fontSize + "px arial";
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters[Math.floor(Math.random()*letters.length)];
-        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
-        if (drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-        drops[i]++;
-      }
+<!-- audio -->
+<audio id="bgAudio" src="youareidots.mp3" loop preload="auto"></audio>
+
+<script>
+/* ===== Matrix background ===== */
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+let fontSize = 16;
+function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; cols = Math.floor(canvas.width / fontSize); drops = Array.from({length:cols}, ()=>Math.random()*canvas.height/fontSize); }
+addEventListener('resize', resizeCanvas);
+const letters = 'アァカサタナハマヤャラワ01YOUAREIDIOT'.split('');
+let cols = Math.floor(window.innerWidth / fontSize);
+let drops = Array.from({length: cols}, ()=>Math.random()*window.innerHeight/fontSize);
+let matrixSpeed = 1;
+function drawMatrix(){
+  ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#07f83a'; ctx.font = fontSize + 'px monospace';
+  for(let i=0;i<drops.length;i++){
+    const ch = letters[Math.floor(Math.random()*letters.length)];
+    ctx.fillText(ch, i*fontSize, drops[i]*fontSize);
+    if (drops[i]*fontSize > canvas.height && Math.random()>0.975) drops[i]=0;
+    drops[i] += 0.4 * matrixSpeed;
+  }
+  requestAnimationFrame(drawMatrix);
+}
+resizeCanvas(); drawMatrix();
+
+/* ===== Files list & per-file encryption sim ===== */
+const filesWrap = document.getElementById('filesWrap');
+const sampleFiles = [
+  {name:"Photos/vacation_2022.zip", size:"1.2 GB"},
+  {name:"Documents/taxes_2023.pdf", size:"420 KB"},
+  {name:"Work/Project_plan.docx", size:"3.4 MB"},
+  {name:"Notes/passwords.txt", size:"12 KB"},
+  {name:"Videos/birthday.mp4", size:"850 MB"},
+  {name:"Music/favorites.mp3", size:"9.1 MB"},
+  {name:"Database/db_backup.sql", size:"120 MB"},
+  {name:"Designs/logo.ai", size:"24 MB"},
+  {name:"Archive/old_mail.eml", size:"6.2 MB"},
+  {name:"Secrets/keys.pem", size:"2 KB"}
+];
+const fileEls = [];
+for (let f of sampleFiles) {
+  const row = document.createElement('div');
+  row.className = 'file-row';
+  row.innerHTML = `
+    <div class="file-icon">F</div>
+    <div class="file-meta">
+      <div class="file-name" data-real="${f.name}">${f.name}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="file-progress"><b style="width:0%"></b></div>
+        <div class="file-status">Queued</div>
+      </div>
+    </div>
+  `;
+  filesWrap.appendChild(row);
+  fileEls.push(row);
+}
+
+/* Simulate encryption pipeline */
+let currentIndex = 0;
+function encryptNext() {
+  if (currentIndex >= fileEls.length) return;
+  const el = fileEls[currentIndex];
+  const nameEl = el.querySelector('.file-name');
+  const bar = el.querySelector('.file-progress > b');
+  const status = el.querySelector('.file-status');
+  status.textContent = 'Encrypting...';
+  let duration = 3000 + Math.random()*5000;
+  let start = Date.now();
+  const scrambleInterval = setInterval(()=> { nameEl.textContent = scrambleText(nameEl.dataset.real); }, 110);
+  const t = setInterval(()=> {
+    const p = Math.min(1, (Date.now()-start)/duration);
+    bar.style.width = (p*100) + '%';
+    if (p >= 1) {
+      clearInterval(t); clearInterval(scrambleInterval);
+      nameEl.textContent = hashLike(nameEl.dataset.real);
+      status.textContent = 'ENCRYPTED';
+      currentIndex++;
+      setTimeout(encryptNext, 380);
     }
-    setInterval(draw, 33);
+  }, 70);
+}
+setTimeout(()=> encryptNext(), 900);
 
-    // Phát nhạc prank
-    const audio = new Audio("youareidots.mp3");
-    audio.loop = true;
-    audio.volume = 0.0; 
-    audio.play();
+/* helpers */
+function scrambleText(s){ const chars = '0123456789ABCDEFabcdef!@#$%^&*()_+-=<>?'; let out = ''; for (let i = 0; i < Math.min(28, s.length); i++) { if (Math.random() < 0.5) out += chars[Math.floor(Math.random()*chars.length)]; else out += s[i]; } return out + (s.length>28 ? '...' : ''); }
+function hashLike(s){ const base = '0123456789ABCDEF'; let parts = []; for (let i=0;i<4;i++){ let part = ''; for (let j=0;j<8;j++) part += base[Math.floor(Math.random()*base.length)]; parts.push(part); } return parts.join('-'); }
 
-    // Tăng volume dần
-    let volume = 0.0;
-    const fadeInterval = setInterval(() => {
-      if (volume < 1.0) {
-        volume += 0.01;
-        audio.volume = Math.min(volume, 1.0);
-      } else {
-        clearInterval(fadeInterval);
-      }
-    }, 200);
+/* ===== Countdown with intense last-10s ===== */
+let total = 30; // 30 seconds as requested
+const countdownEl = document.getElementById('countdown');
+const card = document.getElementById('card');
+const rightPanel = document.getElementById('rightPanel');
+const globalStatus = document.getElementById('globalStatus');
 
-    // Chặn thoát + tự mở lại
-    window.onbeforeunload = function(e) {
-      e.preventDefault();
-      e.returnValue = "⚠️ Hệ thống đang bị virus! Không thể thoát!";
-      setTimeout(() => {
-        window.open(window.location.href, "_blank");
-      }, 100);
-    };
-  </script>
+function updateCountdown(){
+  const mm = String(Math.floor(total/60)).padStart(2,'0');
+  const ss = String(total%60).padStart(2,'0');
+  countdownEl.textContent = `${mm}:${ss}`;
+  if (total <= 10 && total >= 0) enterLast10(total);
+  if (total <= 0) {
+    clearInterval(countInterval);
+    countdownEl.textContent = '00:00';
+    onCountdownEnd();
+  }
+}
+let countInterval = setInterval(()=>{ total--; updateCountdown(); }, 1000);
+updateCountdown();
+
+function enterLast10(sec){
+  card.classList.add('panic'); rightPanel.classList.add('shake');
+  matrixSpeed = 2 + (11 - sec) * 0.9;
+  for (let i=currentIndex;i<fileEls.length;i++){
+    const bar = fileEls[i].querySelector('.file-progress > b');
+    const w = parseFloat(bar.style.width) || 0;
+    bar.style.width = Math.min(100, w + 6 + (11-sec)*2) + '%';
+  }
+  hexbox.classList.add('hex-glow');
+  startBeepPulse(320);
+  globalStatus.textContent = `CRITICAL — ${sec}s LEFT`;
+}
+function onCountdownEnd(){
+  for (let el of fileEls) {
+    el.querySelector('.file-progress > b').style.width = '100%';
+    el.querySelector('.file-status').textContent = 'ENCRYPTED';
+    el.querySelector('.file-name').textContent = hashLike(el.querySelector('.file-name').dataset.real);
+  }
+  globalStatus.textContent = 'ENCRYPTION COMPLETE (demo)';
+  if (audioReady) bgAudio.volume = 1.0;
+  startBeepPulse(180);
+}
+
+/* ===== Hex dump ===== */
+const hexbox = document.getElementById('hexbox');
+function randomHexLine(){ const base = '0123456789abcdef'; let addr = Math.floor(Math.random()*0xFFFF).toString(16).padStart(4,'0'); let bytes = ''; for (let i=0;i<16;i++) bytes += base[Math.floor(Math.random()*base.length)] + base[Math.floor(Math.random()*base.length)] + ' '; const ascii = Array.from({length:16}).map(()=> String.fromCharCode(33 + Math.floor(Math.random()*90)) ).join(''); return `${addr}: ${bytes} ${ascii}`; }
+let hexInterval = setInterval(()=> { for (let i=0;i<2;i++){ const line = document.createElement('div'); line.textContent = randomHexLine(); hexbox.appendChild(line); } if (hexbox.scrollHeight > hexbox.clientHeight) hexbox.scrollTop = hexbox.scrollHeight; }, 400);
+
+/* ===== Audio (bg) + beep ===== */
+const bgAudio = document.getElementById('bgAudio');
+let audioReady = false, fadeHandle = null, soundUnlocked=false;
+function initBgAudio(){ bgAudio.volume = 0; bgAudio.loop = true; bgAudio.play().then(()=>{ audioReady = true; startFadeIn(); }).catch(()=>{}); }
+function startFadeIn(){ if (fadeHandle) clearInterval(fadeHandle); fadeHandle = setInterval(()=>{ if (bgAudio.volume < 0.75) bgAudio.volume = Math.min(0.75, bgAudio.volume + 0.03); else clearInterval(fadeHandle); }, 160); }
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx=null, beepInterval=null;
+function startBeepPulse(ms=380){ if (!audioCtx) audioCtx = new AudioCtx(); if (beepInterval) clearInterval(beepInterval); beepInterval = setInterval(()=> playBeep(880, 0.06), ms); }
+function stopBeepPulse(){ if (beepInterval) { clearInterval(beepInterval); beepInterval=null; } }
+function playBeep(freq=880, dur=0.06){ if (!audioCtx) audioCtx = new AudioCtx(); const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.frequency.value = freq; o.type = 'sine'; g.gain.value = 0.0001; o.connect(g); g.connect(audioCtx.destination); o.start(); g.gain.exponentialRampToValueAtTime(0.4, audioCtx.currentTime + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur); o.stop(audioCtx.currentTime + dur + 0.02); }
+function unlockAudio(){ if (soundUnlocked) return; soundUnlocked=true; initBgAudio(); window.removeEventListener('click',unlockAudio); window.removeEventListener('touchstart',unlockAudio); }
+window.addEventListener('click', unlockAudio, {once:true}); window.addEventListener('touchstart', unlockAudio, {once:true});
+const muteBtn = document.getElementById('muteBtn'); muteBtn.addEventListener('click', ()=>{ if (bgAudio) { bgAudio.muted = !bgAudio.muted; muteBtn.textContent = bgAudio.muted ? 'UNMUTE' : 'MUTE'; } });
+
+/* ===== Payment simulation ===== */
+const copyWallet = document.getElementById('copyWallet');
+copyWallet.addEventListener('click', ()=> { const w = document.getElementById('wallet').textContent; navigator.clipboard?.writeText(w).then(()=> showToast('Wallet copied (demo)')).catch(()=> showToast('Copy failed — select and copy manually')); });
+
+const paidBtn = document.getElementById('paidBtn');
+const verifyBtn = document.getElementById('verifyBtn');
+const payStatus = document.getElementById('payStatus');
+const txIdEl = document.getElementById('txId');
+let simulatedPaid = false;
+
+paidBtn.addEventListener('click', ()=> { simulatedPaid = true; payStatus.textContent = 'Marked as PAID (simulated). Click VERIFY PAYMENT to simulate confirmation.'; showToast('Payment marked (demo). Now press VERIFY PAYMENT (SIM).'); });
+
+verifyBtn.addEventListener('click', ()=> {
+  payStatus.textContent = 'Verifying payment...';
+  verifyBtn.disabled = true;
+  setTimeout(()=> {
+    const success = simulatedPaid ? true : (Math.random() < 0.35);
+    if (success) {
+      const tx = 'TX' + Math.random().toString(36).slice(2,12).toUpperCase();
+      txIdEl.textContent = `TX ID: ${tx}`;
+      txIdEl.classList.remove('hidden');
+      payStatus.textContent = 'Payment verified (simulated). Starting restore...';
+      showToast('Payment simulated verified — restoring (demo).');
+      simulateRestore();
+    } else {
+      payStatus.textContent = 'No payment found. Please complete payment (demo).';
+      showToast('No payment detected (demo).');
+    }
+    verifyBtn.disabled = false;
+  }, 1800 + Math.random()*1200);
+});
+
+/* simulate restore: reverse encryption visuals */
+function simulateRestore(){ stopBeepPulse(); clearInterval(countInterval); let idx = 0; function restoreOne(){ if (idx >= fileEls.length) { if (bgAudio) { bgAudio.pause(); bgAudio.currentTime = 0; } showToast('Files restored (demo). Prank ended.'); document.querySelector('.ransom').remove(); return; } const el = fileEls[idx]; const nameEl = el.querySelector('.file-name'); const bar = el.querySelector('.file-progress > b'); const status = el.querySelector('.file-status'); status.textContent = 'Restoring...'; let start = Date.now(); const dur = 700 + Math.random()*900; const t = setInterval(()=> { const p = Math.min(1, (Date.now()-start)/dur); bar.style.width = (100 - p*100) + '%'; if (p >= 1) { clearInterval(t); nameEl.textContent = nameEl.dataset.real; status.textContent = 'RESTORED'; idx++; setTimeout(restoreOne, 160); } }, 60); } restoreOne(); }
+
+/* helpers */
+function showToast(msg, ms=3000){ const t = document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=> t.remove(), ms); }
+
+const confirmBtn = document.getElementById('confirmBtn');
+const exitBtn = document.getElementById('exitBtn');
+function endPrank(){ clearInterval(countInterval); clearInterval(hexInterval); stopBeepPulse(); if (audioCtx) try { audioCtx.close(); } catch(e){} if (bgAudio) { bgAudio.pause(); bgAudio.currentTime = 0; } const overlay = document.querySelector('.ransom'); if (overlay) overlay.remove(); showToast('Prank stopped — nothing was harmed.'); }
+confirmBtn.addEventListener('click', endPrank);
+exitBtn.addEventListener('click', endPrank);
+window.addEventListener('keydown',(e)=>{ if (e.key === 'Escape') endPrank(); });
+
+/* Hidden exit button (bottom-right) */
+const hiddenExit = document.getElementById('hiddenExit');
+hiddenExit.addEventListener('click', () => {
+  const c = document.getElementById('card');
+  c.animate([{transform:'scale(1)'},{transform:'scale(0.99)'},{transform:'scale(1)'}],{duration:220,iterations:1});
+  endPrank();
+});
+
+/* ensure cleanup on exit */
+confirmBtn.addEventListener('click', ()=> clearInterval(hexInterval));
+exitBtn.addEventListener('click', ()=> clearInterval(hexInterval));
+
+/* init audio unlock on gesture */
+window.addEventListener('click', ()=> { if(!soundUnlocked) { unlockAudio(); } }, {once:true, passive:true});
+
+</script>
 </body>
 </html>
