@@ -1,172 +1,336 @@
-<!doctype html>
-<html lang="vi">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Matrix Prank (safe)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>System Security Scan</title>
 <style>
-  :root{--bg:#000;--matrix:#0f0}
-  html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;font-family:monospace;color:var(--matrix)}
-  .center{height:100vh;display:flex;align-items:center;justify-content:center}
-  button#startBtn{padding:14px 20px;border-radius:10px;border:0;background:#0f62fe;color:#fff;font-weight:700;cursor:pointer}
-  /* overlay & thumbnail */
-  #overlay {
-    position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;
+  /* Reset */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
-  #overlay img {
-    width:220px;height:auto;margin-bottom:20px;animation:flash 0.5s infinite alternate;
-    filter: drop-shadow(0 8px 30px rgba(0,255,0,0.06));
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: black;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, monospace;
+    color: #fff;
   }
-  @keyframes flash {from{opacity:1;} to{opacity:0.12; transform:scale(1.02);} }
-  canvas{position:fixed;inset:0;z-index:10000;pointer-events:none;display:block}
-  /* reveal message (shown briefly when prank ends) */
-  .reveal {
-    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10001;
-    background:rgba(255,255,255,0.96);color:#000;font-size:20px;
-    flex-direction:column;gap:12px;padding:24px;text-align:center;
+
+  /* Canvas ma trận */
+  canvas#matrix {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    display: block;
   }
-  .reveal button{padding:10px 14px;border-radius:8px;border:0;background:#0f62fe;color:#fff;font-weight:700;cursor:pointer}
+
+  /* Thông báo virus chớp nháy */
+  .virus-alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff0000;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    padding: 15px 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #ff0000;
+    z-index: 2000;
+    animation: flash 1.5s infinite;
+    user-select: none;
+  }
+  @keyframes flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Chữ RAIN MATRIX nhấp nháy */
+  #rainMatrixText {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5vw;
+    font-weight: bold;
+    color: #0F0;
+    text-shadow:
+      0 0 5px #0F0,
+      0 0 10px #0F0,
+      0 0 20px #0F0,
+      0 0 40px #0F0;
+    animation: blink 1.5s infinite;
+    z-index: 1;
+    user-select: none;
+  }
+  @keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0.2; }
+  }
+
+  /* Container chính prank */
+  .container {
+    max-width: 800px;
+    margin: 50px auto;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 50px rgba(255, 0, 0, 0.3);
+    border: 2px solid #ff4444;
+    position: relative;
+    z-index: 10;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .header h1 {
+    color: #ff4444;
+    font-size: 28px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  }
+
+  .scan-area {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .progress-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    height: 30px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ff4444 0%, #ff6666 100%);
+    width: 0%;
+    transition: width 0.5s ease;
+    border-radius: 10px;
+  }
+
+  .threat-list {
+    margin: 20px 0;
+  }
+
+  .threat-item {
+    background: rgba(255, 0, 0, 0.2);
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border-left: 4px solid #ff4444;
+  }
+
+  .threat-item.critical {
+    background: rgba(255, 0, 0, 0.3);
+    border-left: 4px solid #ff0000;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+  }
+
+  button {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .remove-btn {
+    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+    color: white;
+  }
+
+  .remove-btn:hover {
+    background: linear-gradient(135deg, #ff0000 0%, #aa0000 100%);
+    transform: scale(1.05);
+  }
+
+  .ignore-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+  }
+
+  .ignore-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .warning {
+    text-align: center;
+    color: #ff6666;
+    font-size: 14px;
+    margin-top: 20px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  /* Popup giả */
+  .fake-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    color: black;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    z-index: 3000;
+    display: none;
+  }
+
+  .fake-popup.active {
+    display: block;
+    animation: shake 0.5s ease-in-out;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+    25% { transform: translate(-50%, -50%) rotate(5deg); }
+    75% { transform: translate(-50%, -50%) rotate(-5deg); }
+  }
+
+  /* Dòng chữ chảy dài phía dưới */
+  #scrollingTextContainer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    background: rgba(0,0,0,0.7);
+    overflow: hidden;
+    z-index: 20;
+    user-select: none;
+  }
+
+  #scrollingText {
+    white-space: nowrap;
+    color: #0F0;
+    font-size: 24px;
+    font-weight: bold;
+    padding-left: 100%;
+    font-family: monospace;
+    text-shadow:
+      0 0 5px #0F0,
+      0 0 10px #0F0,
+      0 0 20px #0F0;
+    animation: scrollLeft 10s linear infinite;
+  }
+
+  @keyframes scrollLeft {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
 </style>
 </head>
 <body>
-  <div class="center">
-    <button id="startBtn">Bắt đầu prank</button>
+
+<!-- Canvas hiệu ứng ma trận -->
+<canvas id="matrix"></canvas>
+
+<!-- Thông báo virus chớp nháy -->
+<div class="virus-alert" id="virusAlert">
+  ⚠️ Bạn đã dính virus! ⚠️
+</div>
+
+<!-- Chữ RAIN MATRIX nhấp nháy -->
+<div id="rainMatrixText">RAIN MATRIX</div>
+
+<!-- Container prank -->
+<div class="container" id="prankContainer">
+  <div class="header">
+    <h1>⚠️ CRITICAL SYSTEM ALERT ⚠️</h1>
+    <p>Windows Security has detected multiple severe threats</p>
   </div>
+  
+  <div class="scan-area">
+    <h3>Scanning system files...</h3>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <div class="threat-list">
+      <div class="threat-item critical">
+        <strong>Trojan:Win32/Malware.A!rfn</strong> - System critical area
+      </div>
+      <div class="threat-item">
+        <strong>PUA:Win32/UnwantedSoftware.B</strong> - Browser extensions
+      </div>
+      <div class="threat-item critical">
+        <strong>Ransomware:Win32/CryptoLocker.C</strong> - Documents folder
+      </div>
+      <div class="threat-item">
+        <strong>Adware:Win32/PopUnder.D</strong> - System registry
+      </div>
+    </div>
+  </div>
+  
+  <div class="buttons">
+    <button class="remove-btn" onclick="removeThreats()">REMOVE ALL THREATS</button>
+    <button class="ignore-btn" onclick="ignoreThreats()">IGNORE (NOT RECOMMENDED)</button>
+  </div>
+  
+  <div class="warning">
+    ⚠️ Immediate action required! Your system is at risk of data loss and identity theft.
+  </div>
+</div>
+
+<!-- Popup giả -->
+<div class="fake-popup" id="fakePopup">
+  <h3>System Error</h3>
+  <p>Cannot remove threats. System integrity compromised.</p>
+  <button onclick="closePopup()">OK</button>
+</div>
+
+<!-- Dòng chữ chảy dài phía dưới -->
+<div id="scrollingTextContainer">
+  <div id="scrollingText">ib Noll team để mở khóa</div>
+</div>
 
 <script>
-/*
- Safe matrix prank:
- - dùng audio trực tiếp từ Myinstants (direct mp3 link)
- - user click để bắt đầu (user gesture cho phép play)
- - matrix rain + flashing thumbnail
- - autop-cleanup khi audio 'ended' OR when document.hidden becomes true
- - không chặn việc đóng tab/cửa sổ (mình không làm phần đó)
-*/
+  // Ma trận ký tự
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
 
-const AUDIO_SRC = "https://www.myinstants.com/media/sounds/you-are-an-idiot-hahahahahahahahahahahahahaha.mp3";
-// nếu bạn muốn thay bằng mp3 khác, đổi AUDIO_SRC
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
 
-let audioEl = null;
-let canvas = null;
-let ctx = null;
-let matrixInterval = null;
-let drops = [];
-const fontSize = 16;
+  const characters = 'アァカサタナハマヤャラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*+-=<>';
 
-function createOverlay(thumbnailSrc){
-  const overlay = document.createElement('div');
-  overlay.id = 'overlay';
-  overlay.innerHTML = `<img id="thumb" src="${thumbnailSrc}" alt="thumb">`;
-  document.body.appendChild(overlay);
-  return overlay;
-}
+  const fontSize = 16;
+  const columns = Math.floor(width / fontSize);
 
-function startMatrix(){
-  canvas = document.createElement('canvas');
-  canvas.id = 'matrixCanvas';
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  document.body.appendChild(canvas);
-  ctx = canvas.getContext('2d');
-
-  const columns = Math.floor(canvas.width / fontSize) + 1;
-  drops = Array(columns).fill(1);
-
-  function draw(){
-    // semi-transparent black to create fade trail
-    ctx.fillStyle = 'rgba(0,0,0,0.06)';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = '#0f0';
-    ctx.font = fontSize + 'px monospace';
-    for(let i=0;i<drops.length;i++){
-      const ch = String.fromCharCode(0x30A0 + Math.random()*96);
-      ctx.fillText(ch, i * fontSize, drops[i] * fontSize);
-      if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
-    }
+  const drops = [];
+  for(let x = 0; x < columns; x++) {
+    drops[x] = Math.random() * height;
   }
-  matrixInterval = setInterval(draw, 50);
 
-  // responsive
-  window.addEventListener('resize', () => {
-    if(canvas){
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-  });
-}
-
-function cleanupAndReveal(reason){
-  // stop matrix
-  if(matrixInterval) { clearInterval(matrixInterval); matrixInterval = null; }
-  if(canvas){ canvas.remove(); canvas = null; }
-  // stop audio
-  if(audioEl){ try{ audioEl.pause(); audioEl.src = ''; audioEl.remove(); }catch(e){} audioEl = null; }
-
-  // remove overlay thumb
-  const ov = document.getElementById('overlay');
-  if(ov) ov.remove();
-
-  // show short reveal message then allow reload/close
-  const r = document.createElement('div');
-  r.className = 'reveal';
-  r.innerHTML = `<div style="font-size:28px;font-weight:800">BỊ TROLL RỒI 😜</div>
-                 <div>Prank đã dừng. Lý do: <strong>${reason}</strong></div>
-                 <div style="display:flex;gap:12px;margin-top:8px">
-                   <button id="reloadBtn">Tải lại</button>
-                   <button id="closeBtn">Đóng tab</button>
-                 </div>`;
-  document.body.appendChild(r);
-  document.getElementById('reloadBtn').addEventListener('click', ()=> location.reload());
-  document.getElementById('closeBtn').addEventListener('click', ()=> { try{ window.close(); }catch(e){ location.href='about:blank'; }});
-}
-
-function startPrank(){
-  // remove the start button container
-  const startBtn = document.getElementById('startBtn');
-  if(startBtn) startBtn.parentElement.remove();
-
-  // create overlay with your thumbnail filename (put thumb.png next to HTML or change path)
-  createOverlay('thumb.png');
-
-  // start matrix rendering
-  startMatrix();
-
-  // create audio element (user gesture ensures play)
-  audioEl = document.createElement('audio');
-  audioEl.src = AUDIO_SRC;
-  audioEl.preload = 'auto';
-  audioEl.style.display = 'none';
-  audioEl.crossOrigin = 'anonymous';
-  document.body.appendChild(audioEl);
-
-  // when audio ends -> cleanup
-  audioEl.addEventListener('ended', () => {
-    cleanupAndReveal('audio-ended');
-  });
-
-  // if page becomes hidden (user switches tab / locks screen) -> cleanup
-  function onVisibility(){
-    if(document.hidden){
-      // clean up politely
-      cleanupAndReveal('visibility-hidden');
-    }
-  }
-  document.addEventListener('visibilitychange', onVisibility, {once:true});
-
-  // try to play
-  const p = audioEl.play();
-  if(p && p.catch){
-    p.catch(()=> {
-      // Some browsers may block autoplay even on click in odd cases — show a small notice
-      console.warn('Playback blocked — user interaction required.');
-      // we still keep matrix running; if playback blocked, we stop when visibilitychange or if user closes
-    });
-  }
-}
-
-// start button binds
-document.getElementById('startBtn').addEventListener('click', startPrank);
-</script>
-</body>
-</html>
+  function drawMatrix() {
