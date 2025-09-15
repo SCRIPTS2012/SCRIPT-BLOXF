@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Matrix Prank (safe)</title>
+<style>
+  :root{--bg:#000;--matrix:#0f0}
+  html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;font-family:monospace;color:var(--matrix)}
+  .center{height:100vh;display:flex;align-items:center;justify-content:center}
+  button#startBtn{padding:14px 20px;border-radius:10px;border:0;background:#0f62fe;color:#fff;font-weight:700;cursor:pointer}
+  /* overlay & thumbnail */
+  #overlay {
+    position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;
+  }
+  #overlay img {
+    width:220px;height:auto;margin-bottom:20px;animation:flash 0.5s infinite alternate;
+    filter: drop-shadow(0 8px 30px rgba(0,255,0,0.06));
+  }
+  @keyframes flash {from{opacity:1;} to{opacity:0.12; transform:scale(1.02);} }
+  canvas{position:fixed;inset:0;z-index:10000;pointer-events:none;display:block}
+  /* reveal message (shown briefly when prank ends) */
+  .reveal {
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10001;
+    background:rgba(255,255,255,0.96);color:#000;font-size:20px;
+    flex-direction:column;gap:12px;padding:24px;text-align:center;
+  }
+  .reveal button{padding:10px 14px;border-radius:8px;border:0;background:#0f62fe;color:#fff;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="center">
+    <button id="startBtn">Bắt đầu prank</button>
+  </div>
+
+<script>
+/*
+ Safe matrix prank:
+ - dùng audio trực tiếp từ Myinstants (direct mp3 link)
+ - user click để bắt đầu (user gesture cho phép play)
+ - matrix rain + flashing thumbnail
+ - autop-cleanup khi audio 'ended' OR when document.hidden becomes true
+ - không chặn việc đóng tab/cửa sổ (mình không làm phần đó)
+*/
+
+const AUDIO_SRC = "https://www.myinstants.com/media/sounds/you-are-an-idiot-hahahahahahahahahahahahahaha.mp3";
+// nếu bạn muốn thay bằng mp3 khác, đổi AUDIO_SRC
+
+let audioEl = null;
+let canvas = null;
+let ctx = null;
+let matrixInterval = null;
+let drops = [];
+const fontSize = 16;
+
+function createOverlay(thumbnailSrc){
+  const overlay = document.createElement('div');
+  overlay.id = 'overlay';
+  overlay.innerHTML = `<img id="thumb" src="${thumbnailSrc}" alt="thumb">`;
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function startMatrix(){
+  canvas = document.createElement('canvas');
+  canvas.id = 'matrixCanvas';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild(canvas);
+  ctx = canvas.getContext('2d');
+
+  const columns = Math.floor(canvas.width / fontSize) + 1;
+  drops = Array(columns).fill(1);
+
+  function draw(){
+    // semi-transparent black to create fade trail
+    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#0f0';
+    ctx.font = fontSize + 'px monospace';
+    for(let i=0;i<drops.length;i++){
+      const ch = String.fromCharCode(0x30A0 + Math.random()*96);
+      ctx.fillText(ch, i * fontSize, drops[i] * fontSize);
+      if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  matrixInterval = setInterval(draw, 50);
+
+  // responsive
+  window.addEventListener('resize', () => {
+    if(canvas){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+  });
+}
+
+function cleanupAndReveal(reason){
+  // stop matrix
+  if(matrixInterval) { clearInterval(matrixInterval); matrixInterval = null; }
+  if(canvas){ canvas.remove(); canvas = null; }
+  // stop audio
+  if(audioEl){ try{ audioEl.pause(); audioEl.src = ''; audioEl.remove(); }catch(e){} audioEl = null; }
+
+  // remove overlay thumb
+  const ov = document.getElementById('overlay');
+  if(ov) ov.remove();
+
+  // show short reveal message then allow reload/close
+  const r = document.createElement('div');
+  r.className = 'reveal';
+  r.innerHTML = `<div style="font-size:28px;font-weight:800">BỊ TROLL RỒI 😜</div>
+                 <div>Prank đã dừng. Lý do: <strong>${reason}</strong></div>
+                 <div style="display:flex;gap:12px;margin-top:8px">
+                   <button id="reloadBtn">Tải lại</button>
+                   <button id="closeBtn">Đóng tab</button>
+                 </div>`;
+  document.body.appendChild(r);
+  document.getElementById('reloadBtn').addEventListener('click', ()=> location.reload());
+  document.getElementById('closeBtn').addEventListener('click', ()=> { try{ window.close(); }catch(e){ location.href='about:blank'; }});
+}
+
+function startPrank(){
+  // remove the start button container
+  const startBtn = document.getElementById('startBtn');
+  if(startBtn) startBtn.parentElement.remove();
+
+  // create overlay with your thumbnail filename (put thumb.png next to HTML or change path)
+  createOverlay('thumb.png');
+
+  // start matrix rendering
+  startMatrix();
+
+  // create audio element (user gesture ensures play)
+  audioEl = document.createElement('audio');
+  audioEl.src = AUDIO_SRC;
+  audioEl.preload = 'auto';
+  audioEl.style.display = 'none';
+  audioEl.crossOrigin = 'anonymous';
+  document.body.appendChild(audioEl);
+
+  // when audio ends -> cleanup
+  audioEl.addEventListener('ended', () => {
+    cleanupAndReveal('audio-ended');
+  });
+
+  // if page becomes hidden (user switches tab / locks screen) -> cleanup
+  function onVisibility(){
+    if(document.hidden){
+      // clean up politely
+      cleanupAndReveal('visibility-hidden');
+    }
+  }
+  document.addEventListener('visibilitychange', onVisibility, {once:true});
+
+  // try to play
+  const p = audioEl.play();
+  if(p && p.catch){
+    p.catch(()=> {
+      // Some browsers may block autoplay even on click in odd cases — show a small notice
+      console.warn('Playback blocked — user interaction required.');
+      // we still keep matrix running; if playback blocked, we stop when visibilitychange or if user closes
+    });
+  }
+}
+
+// start button binds
+document.getElementById('startBtn').addEventListener('click', startPrank);
+</script>
+</body>
+</html>
