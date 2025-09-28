@@ -1,0 +1,347 @@
+--// VOID_TEAM GUI - FULL SCRIPT
+--// by MZ HUB + ShadowVN Kaitou Fix Lag Ultimate
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local Lighting = game:GetService("Lighting")
+
+local ScreenGui = Instance.new("ScreenGui")
+local Main = Instance.new("Frame")
+local UIGridLayout = Instance.new("UIGridLayout")
+local Title = Instance.new("TextLabel")
+local Close = Instance.new("TextButton")
+
+ScreenGui.Parent = game:GetService("CoreGui")
+Main.Name = "Main"
+Main.Parent = ScreenGui
+Main.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Main.Size = UDim2.new(0, 500, 0, 300)
+Main.Position = UDim2.new(0.25,0,0.25,0)
+
+Title.Parent = Main
+Title.Size = UDim2.new(1,0,0,30)
+Title.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Title.Text = "VOID_TEAM"
+Title.TextColor3 = Color3.fromRGB(255,0,0)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 24
+
+Close.Parent = Main
+Close.Size = UDim2.new(0,30,0,30)
+Close.Position = UDim2.new(1,-35,0,5)
+Close.Text = "X"
+Close.TextColor3 = Color3.fromRGB(255,255,255)
+Close.BackgroundColor3 = Color3.fromRGB(255,0,0)
+Close.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+UIGridLayout.Parent = Main
+UIGridLayout.CellSize = UDim2.new(0,100,0,40)
+UIGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIGridLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+UIGridLayout.CellPadding = UDim2.new(0,5,0,5)
+
+-- Button creator
+local function CreateBtn(name, callback)
+    local btn = Instance.new("TextButton")
+    btn.Parent = Main
+    btn.Text = name
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 18
+    btn.TextColor3 = Color3.fromRGB(0,0,0)
+    btn.BackgroundColor3 = Color3.fromRGB(255,0,0)
+    btn.MouseButton1Click:Connect(callback)
+end
+
+-- VAR
+local flying, noclip, infjump, aimbot, npcAimbot = false,false,false,false,false
+
+-- Fly
+CreateBtn("Fly", function()
+    flying = not flying
+    if flying then
+        local bodyVel = Instance.new("BodyVelocity")
+        bodyVel.Velocity = Vector3.new(0,0,0)
+        bodyVel.MaxForce = Vector3.new(4000,4000,4000)
+        bodyVel.Parent = LocalPlayer.Character.HumanoidRootPart
+        RunService.RenderStepped:Connect(function()
+            if flying then
+                local moveDir = LocalPlayer.Character.Humanoid.MoveDirection
+                bodyVel.Velocity = moveDir * 50
+            else
+                bodyVel:Destroy()
+            end
+        end)
+    end
+end)
+
+-- Inf Jump
+UserInputService.JumpRequest:Connect(function()
+    if infjump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+CreateBtn("Inf Jumps", function() infjump = not infjump end)
+
+-- NoClip
+RunService.Stepped:Connect(function()
+    if noclip and LocalPlayer.Character then
+        for _,v in pairs(LocalPlayer.Character:GetDescendants()) do
+            if v:IsA("BasePart") and v.CanCollide then
+                v.CanCollide = false
+            end
+        end
+    end
+end)
+CreateBtn("No Clip", function() noclip = not noclip end)
+
+-- Speed
+CreateBtn("Speed", function()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = 100
+    end
+end)
+
+-- Hitbox Player
+CreateBtn("Hitbox", function()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            plr.Character.HumanoidRootPart.Size = Vector3.new(10,10,10)
+            plr.Character.HumanoidRootPart.Transparency = 0.7
+            plr.Character.HumanoidRootPart.BrickColor = BrickColor.new("Bright red")
+            plr.Character.HumanoidRootPart.Material = "Neon"
+        end
+    end
+end)
+
+-- Hitbox NPC
+CreateBtn("Npc Hitbox", function()
+    for _,npc in pairs(workspace:GetDescendants()) do
+        if npc:IsA("Model") and npc:FindFirstChild("HumanoidRootPart") and npc:FindFirstChildOfClass("Humanoid") then
+            npc.HumanoidRootPart.Size = Vector3.new(10,10,10)
+            npc.HumanoidRootPart.Transparency = 0.7
+            npc.HumanoidRootPart.Material = "Neon"
+            npc.HumanoidRootPart.BrickColor = BrickColor.new("Bright blue")
+        end
+    end
+end)
+
+-- Tpwalk
+CreateBtn("Tpwalk", function()
+    RunService.Heartbeat:Connect(function()
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+            LocalPlayer.Character:TranslateBy(Vector3.new(0,0,-3))
+        end
+    end)
+end)
+
+-- Inf Yield
+CreateBtn("Inf Yeild", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+end)
+
+-- ✅ Fix Lag Full Ultimate
+CreateBtn("Reduce Lag", function()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire")
+        or v:IsA("Explosion") or v:IsA("Beam") or v:IsA("PointLight") or v:IsA("SpotLight") then
+            v:Destroy()
+        elseif v:IsA("Decal") or v:IsA("Texture") then
+            v:Destroy()
+        end
+    end
+
+    Lighting.GlobalShadows = false
+    Lighting.Brightness = 3
+    Lighting.ClockTime = 14
+    Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+    Lighting.FogStart = 0
+    Lighting.FogEnd = 1e10
+    Lighting.FogColor = Color3.new(1, 1, 1)
+
+    for _, v in pairs(Lighting:GetChildren()) do
+        if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") 
+        or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+            v:Destroy()
+        end
+    end
+
+    local Terrain = workspace:FindFirstChildOfClass("Terrain")
+    if Terrain then
+        Terrain.WaterWaveSize = 0
+        Terrain.WaterWaveSpeed = 0
+        Terrain.WaterReflectance = 0
+        Terrain.WaterTransparency = 0
+    end
+
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("MeshPart") or v:IsA("Part") then
+            local name = string.lower(v.Name)
+            if string.find(name, "tree") or string.find(name, "grass") or string.find(name, "bush") 
+            or string.find(name, "leaf") or string.find(name, "flower") or string.find(name, "rock") 
+            or string.find(name, "prop") or string.find(name, "deco") then
+                v:Destroy()
+            else
+                v.Material = Enum.Material.Plastic
+                v.Reflectance = 0
+            end
+        end
+    end
+
+    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+    pcall(function() setfpscap(240) end)
+    workspace.StreamingEnabled = true
+    workspace.StreamingMinRadius = 32
+
+    print("✅ Fix Lag Full Ultimate: Xong!")
+end)
+
+-- Anti AFK
+CreateBtn("Anti AFK", function()
+    local vu = game:GetService("VirtualUser")
+    LocalPlayer.Idled:Connect(function()
+        vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+    end)
+end)
+
+-- No Fog
+CreateBtn("No Fog", function()
+    Lighting.FogEnd = 100000
+end)
+
+-- Brightness
+CreateBtn("Brightness", function()
+    Lighting.Brightness = 5
+end)
+
+-- Colour
+CreateBtn("Colour", function()
+    for _,p in pairs(LocalPlayer.Character:GetDescendants()) do
+        if p:IsA("BasePart") then
+            p.BrickColor = BrickColor.Random()
+        end
+    end
+end)
+
+-- ESP Player
+CreateBtn("Esp", function()
+    for _,plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+            local BillboardGui = Instance.new("BillboardGui")
+            BillboardGui.Size = UDim2.new(0,200,0,50)
+            BillboardGui.Adornee = plr.Character.Head
+            BillboardGui.AlwaysOnTop = true
+            local TextLabel = Instance.new("TextLabel")
+            TextLabel.Size = UDim2.new(1,0,1,0)
+            TextLabel.Text = plr.Name
+            TextLabel.TextColor3 = Color3.fromRGB(255,0,0)
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.Parent = BillboardGui
+            BillboardGui.Parent = plr.Character.Head
+        end
+    end
+end)
+
+-- NPC ESP
+CreateBtn("Npc Esp", function()
+    for _,npc in pairs(workspace:GetDescendants()) do
+        if npc:IsA("Model") and npc:FindFirstChild("Head") and npc:FindFirstChildOfClass("Humanoid") then
+            local BillboardGui = Instance.new("BillboardGui")
+            BillboardGui.Size = UDim2.new(0,200,0,50)
+            BillboardGui.Adornee = npc.Head
+            BillboardGui.AlwaysOnTop = true
+            local TextLabel = Instance.new("TextLabel")
+            TextLabel.Size = UDim2.new(1,0,1,0)
+            TextLabel.Text = "NPC"
+            TextLabel.TextColor3 = Color3.fromRGB(0,255,0)
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.Parent = BillboardGui
+            BillboardGui.Parent = npc.Head
+        end
+    end
+end)
+
+-- Aimbot Player
+CreateBtn("Aimbot", function()
+    aimbot = not aimbot
+    RunService.RenderStepped:Connect(function()
+        if aimbot then
+            local closest,dist = nil,math.huge
+            for _,plr in pairs(Players:GetPlayers()) do
+                if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+                    local pos,_ = Camera:WorldToViewportPoint(plr.Character.Head.Position)
+                    local mag = (Vector2.new(pos.X,pos.Y) - UserInputService:GetMouseLocation()).Magnitude
+                    if mag < dist then
+                        dist = mag
+                        closest = plr
+                    end
+                end
+            end
+            if closest then
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, closest.Character.Head.Position)
+            end
+        end
+    end)
+end)
+
+-- NPC Aimbot
+CreateBtn("Npc Aimbot", function()
+    npcAimbot = not npcAimbot
+    RunService.RenderStepped:Connect(function()
+        if npcAimbot then
+            local closest,dist = nil,math.huge
+            for _,npc in pairs(workspace:GetDescendants()) do
+                if npc:IsA("Model") and npc:FindFirstChild("Head") and npc:FindFirstChildOfClass("Humanoid") then
+                    local pos,_ = Camera:WorldToViewportPoint(npc.Head.Position)
+                    local mag = (Vector2.new(pos.X,pos.Y) - UserInputService:GetMouseLocation()).Magnitude
+                    if mag < dist then
+                        dist = mag
+                        closest = npc
+                    end
+                end
+            end
+            if closest then
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, closest.Head.Position)
+            end
+        end
+    end)
+end)
+
+-- Ping Display
+CreateBtn("Ping", function()
+    game.StarterGui:SetCore("ChatMakeSystemMessage", {
+        Text = "Ping: "..game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValueString();
+        Color = Color3.fromRGB(255,255,0)
+    })
+end)
+
+-- FPS Counter
+CreateBtn("Fps", function()
+    RunService.RenderStepped:Connect(function()
+        local fps = math.floor(1/RunService.RenderStepped:Wait())
+        game.StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = "FPS: "..fps;
+            Color = Color3.fromRGB(0,255,255)
+        })
+    end)
+end)
+
+-- ServerHop
+CreateBtn("ServerHop", function()
+    local Http = game:GetService("HttpService")
+    local TeleportService = game:GetService("TeleportService")
+    local PlaceID = game.PlaceId
+    local servers = Http:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100"))
+    for _,srv in pairs(servers.data) do
+        if srv.playing < srv.maxPlayers then
+            TeleportService:TeleportToPlaceInstance(PlaceID, srv.id, LocalPlayer)
+            break
+        end
+    end
+end)
