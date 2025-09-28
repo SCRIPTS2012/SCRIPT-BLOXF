@@ -1,0 +1,61 @@
+--// Super FPS Auto by ShadowVN Kaitou
+-- Tối ưu hóa cực mạnh cho máy yếu: xóa hiệu ứng, xoá trang trí, boost FPS
+
+-- Xóa hiệu ứng skill & particle
+for _, v in pairs(workspace:GetDescendants()) do
+    if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire")
+    or v:IsA("Explosion") or v:IsA("Beam") or v:IsA("PointLight") or v:IsA("SpotLight") then
+        v:Destroy()
+    elseif v:IsA("Decal") or v:IsA("Texture") then
+        v:Destroy()
+    end
+end
+
+-- Lighting: sáng map + xoá fog
+local Lighting = game:GetService("Lighting")
+Lighting.GlobalShadows = false
+Lighting.Brightness = 3
+Lighting.ClockTime = 14
+Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+Lighting.FogStart = 0
+Lighting.FogEnd = 1e10
+
+-- Xóa PostEffects
+for _, v in pairs(Lighting:GetChildren()) do
+    if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") 
+    or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+        v:Destroy()
+    end
+end
+
+-- Terrain tối giản
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
+if Terrain then
+    Terrain.WaterWaveSize = 0
+    Terrain.WaterWaveSpeed = 0
+    Terrain.WaterReflectance = 0
+    Terrain.WaterTransparency = 0
+end
+
+-- Xóa cây cối / trang trí
+for _, v in pairs(workspace:GetDescendants()) do
+    if v:IsA("MeshPart") or v:IsA("Part") then
+        local name = string.lower(v.Name)
+        if string.find(name, "tree") or string.find(name, "grass") or string.find(name, "bush") 
+        or string.find(name, "leaf") or string.find(name, "flower") or string.find(name, "rock") 
+        or string.find(name, "prop") or string.find(name, "deco") then
+            v:Destroy()
+        else
+            v.Material = Enum.Material.Plastic
+            v.Reflectance = 0
+        end
+    end
+end
+
+-- Boost FPS
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+pcall(function() setfpscap(240) end) -- tăng FPS tối đa nếu executor hỗ trợ
+workspace.StreamingEnabled = true
+workspace.StreamingMinRadius = 32
+
+print("✅ Super FPS Auto: Fix Lag bật ngay - xoá hiệu ứng, trang trí, fog, boost FPS.")
