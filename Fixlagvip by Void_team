@@ -1,7 +1,7 @@
---// Super FPS Auto by ShadowVN Kaitou
--- Tối ưu hóa cực mạnh cho máy yếu: xóa hiệu ứng, xoá trang trí, boost FPS
+--// Fix Lag Full Ultimate by ShadowVN Kaitou
+-- Gom tất cả tính năng: Xóa hiệu ứng, trang trí, fog, tăng sáng, boost FPS
 
--- Xóa hiệu ứng skill & particle
+-- Xóa hiệu ứng skill & particle nhưng giữ animation
 for _, v in pairs(workspace:GetDescendants()) do
     if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire")
     or v:IsA("Explosion") or v:IsA("Beam") or v:IsA("PointLight") or v:IsA("SpotLight") then
@@ -14,13 +14,14 @@ end
 -- Lighting: sáng map + xoá fog
 local Lighting = game:GetService("Lighting")
 Lighting.GlobalShadows = false
-Lighting.Brightness = 3
-Lighting.ClockTime = 14
+Lighting.Brightness = 3 -- sáng hơn mặc định
+Lighting.ClockTime = 14 -- ban ngày
 Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
 Lighting.FogStart = 0
 Lighting.FogEnd = 1e10
+Lighting.FogColor = Color3.new(1, 1, 1)
 
--- Xóa PostEffects
+-- Xóa PostEffects thừa
 for _, v in pairs(Lighting:GetChildren()) do
     if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") 
     or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
@@ -37,7 +38,7 @@ if Terrain then
     Terrain.WaterTransparency = 0
 end
 
--- Xóa cây cối / trang trí
+-- Xóa cây cối / trang trí thừa
 for _, v in pairs(workspace:GetDescendants()) do
     if v:IsA("MeshPart") or v:IsA("Part") then
         local name = string.lower(v.Name)
@@ -54,8 +55,8 @@ end
 
 -- Boost FPS
 settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-pcall(function() setfpscap(240) end) -- tăng FPS tối đa nếu executor hỗ trợ
+pcall(function() setfpscap(240) end) -- nâng FPS tối đa (nếu executor hỗ trợ)
 workspace.StreamingEnabled = true
 workspace.StreamingMinRadius = 32
 
-print("✅ Super FPS Auto: Fix Lag bật ngay - xoá hiệu ứng, trang trí, fog, boost FPS.")
+print("✅ Fix Lag Full Ultimate: Đã xóa hiệu ứng, đồ trang trí, fog, tối giản đồ họa, tăng sáng, boost FPS!")
