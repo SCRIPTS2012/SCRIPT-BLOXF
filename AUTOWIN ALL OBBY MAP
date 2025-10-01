@@ -1,0 +1,177 @@
+-- Void_GUI👾 | Auto Obby Win | by 👾Void_team🇻🇳
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Tạo ScreenGui
+local gui = Instance.new("ScreenGui")
+gui.Name = "Void_GUI"
+gui.ResetOnSpawn = false
+gui.Parent = game:GetService("CoreGui")
+
+-- Tạo Frame chính
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Size = UDim2.new(0,200,0,100)
+mainFrame.Position = UDim2.new(0.4,0,0.3,0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+-- Bo góc
+local corner = Instance.new("UICorner", mainFrame)
+corner.CornerRadius = UDim.new(0,10)
+
+-- Tiêu đề
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1,0,0,30)
+title.BackgroundTransparency = 1
+title.Text = "👾 Void_GUI Auto Win"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextColor3 = Color3.fromRGB(0,255,0)
+
+-- Nút Auto Win
+local button = Instance.new("TextButton", mainFrame)
+button.Size = UDim2.new(0.8,0,0.4,0)
+button.Position = UDim2.new(0.1,0,0.45,0)
+button.Text = "Auto Win"
+button.BackgroundColor3 = Color3.fromRGB(60,60,60)
+button.TextColor3 = Color3.fromRGB(255,255,255)
+button.Font = Enum.Font.GothamBold
+button.TextSize = 18
+
+local btnCorner = Instance.new("UICorner", button)
+btnCorner.CornerRadius = UDim.new(0,8)
+
+-- ===== Logic tìm đích =====
+local FINISH_KEYWORDS = {
+    "finish","goal","end","exit","win",
+    "finishline","endpoint","victory","goalpart","finishpart","exitpart"
+}
+
+local function isFinishName(name)
+    if not name then return false end
+    local n = tostring(name):lower()
+    for _,k in ipairs(FINISH_KEYWORDS) do
+        if n:find(k) then return true end
+    end
+    return false
+end
+
+local function findFinishParts()
+    local results = {}
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") then
+            if isFinishName(obj.Name) or (obj.Parent and isFinishName(obj.Parent.Name)) then
+                table.insert(results, obj)
+            end
+        end
+    end
+    return results
+end
+
+local function getFarthestFinish()
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    local parts = findFinishParts()
+    if #parts == 0 then return nil end
+    local farthest, farDist = nil, -math.huge
+    for _,p in ipairs(parts) do
+        local ok, pos = pcall(function() return p.Position end)
+        if ok and pos then
+            local d = (hrp.Position - pos).Magnitude
+            if d > farDist then
+                farDist = d
+                farthest = p
+            end
+        end
+    end
+    return farthest
+end
+
+local function teleportTo(part)
+    if not part then return end
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    local success = false
+    if typeof(firetouchinterest) == "function" then
+        pcall(function()
+            firetouchinterest(hrp, part, 0)
+            firetouchinterest(hrp, part, 1)
+            success = true
+        end)
+    end
+    if not success then
+        pcall(function()
+            hrp.CFrame = part.CFrame + Vector3.new(0,3,0)
+        end)
+    end
+end
+
+-- ===== Overlay tạo hiệu ứng =====
+local function showOverlay(msg)
+    local overlay = Instance.new("Frame", gui)
+    overlay.Size = UDim2.new(1,0,1,0)
+    overlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    overlay.BackgroundTransparency = 0.4
+
+    -- credit
+    local credit = Instance.new("TextLabel", overlay)
+    credit.Size = UDim2.new(1,0,0,40)
+    credit.Position = UDim2.new(0,0,0,0)
+    credit.BackgroundTransparency = 1
+    credit.Text = "by 👾Void_team🇻🇳"
+    credit.Font = Enum.Font.GothamBold
+    credit.TextSize = 24
+    credit.TextColor3 = Color3.fromRGB(0,255,0)
+    credit.TextStrokeTransparency = 0.2
+
+    -- text chính
+    local text = Instance.new("TextLabel", overlay)
+    text.Size = UDim2.new(1,0,0.2,0)
+    text.Position = UDim2.new(0,0,0.4,0)
+    text.BackgroundTransparency = 1
+    text.Text = msg
+    text.Font = Enum.Font.GothamBlack
+    text.TextSize = 32
+    text.TextColor3 = Color3.fromRGB(255,0,255)
+    text.TextStrokeTransparency = 0.2
+
+    local uiStroke = Instance.new("UIStroke", text)
+    uiStroke.Thickness = 2
+    uiStroke.Color = Color3.fromRGB(255,255,255)
+    uiStroke.Transparency = 0.2
+
+    return overlay, text, uiStroke
+end
+
+local function pulseEffect(label, stroke, times)
+    for i=1, times do
+        for t=0,1,0.05 do
+            label.TextColor3 = Color3.fromHSV(0.83, 1, t)
+            stroke.Transparency = 0.5 - (t/2)
+            task.wait(0.05)
+        end
+        for t=1,0,-0.05 do
+            label.TextColor3 = Color3.fromHSV(0.83, 1, t)
+            stroke.Transparency = 0.5 - (t/2)
+            task.wait(0.05)
+        end
+    end
+end
+
+-- ===== Khi bấm nút =====
+button.MouseButton1Click:Connect(function()
+    local overlay, text, stroke = showOverlay("✨ Hãy đợi một tý... Void_GUI👾 đang tìm kiếm ✨")
+    task.wait(2)
+    local target = getFarthestFinish()
+    if target then
+        teleportTo(target)
+        text.Text = "🇻🇳 Cảm ơn đã sử dụng Void_GUI👾 :)"
+        pulseEffect(text, stroke, 3)
+    else
+        text.Text = "❌ Không tìm thấy đích trong map này!"
+    end
+    task.wait(4)
+    overlay:Destroy()
+end)
