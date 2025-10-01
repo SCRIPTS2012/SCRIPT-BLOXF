@@ -1,4 +1,4 @@
--- 👾 Void_GUI Universal Auto-Win + AutoLoop 🇻🇳
+-- 👾 Void_GUI Universal Auto-Win + AutoLoop (Draggable) 🇻🇳
 -- by Void_Team
 
 -- UI
@@ -103,13 +103,11 @@ local function FindGoal()
     for _, obj in ipairs(workspace:GetDescendants()) do
         if obj:IsA("BasePart") then
             local name = string.lower(obj.Name)
-            -- Ưu tiên part có tên đặc trưng
             if string.find(name,"finish") or string.find(name,"end") or string.find(name,"goal") or string.find(name,"win") then
                 finishPart = obj
                 break
             end
 
-            -- Nếu không có, lấy part xa nhất
             local dist = (obj.Position - root.Position).Magnitude
             if dist > farthestDist then
                 farthestDist = dist
@@ -122,7 +120,7 @@ local function FindGoal()
     if finishPart then
         root.CFrame = finishPart.CFrame + Vector3.new(0,5,0)
         ThankYou.Visible = true
-        task.wait(3)
+        task.wait(1.5)
         ThankYou.Visible = false
     else
         warn("⚠ Không tìm thấy đích nào!")
@@ -134,23 +132,27 @@ Button.MouseButton1Click:Connect(function()
     FindGoal()
 end)
 
--- Auto Loop
+-- Auto Loop fix
 local autoLoop = false
+local loopThread
+
 LoopButton.MouseButton1Click:Connect(function()
     autoLoop = not autoLoop
     if autoLoop then
         LoopButton.Text = "🔁 Auto Loop: ON"
         LoopButton.BackgroundColor3 = Color3.fromRGB(20,80,20)
+
+        loopThread = task.spawn(function()
+            while autoLoop do
+                pcall(function()
+                    FindGoal()
+                end)
+                task.wait(3) -- delay giữa mỗi lần loop
+            end
+        end)
     else
         LoopButton.Text = "🔁 Auto Loop: OFF"
         LoopButton.BackgroundColor3 = Color3.fromRGB(80,20,20)
+        autoLoop = false
     end
 end)
-
--- Khi respawn thì check autoLoop
-game.Players.LocalPlayer.CharacterAdded:Connect(function()
-    if autoLoop then
-        task.wait(2)
-        FindGoal()
-    end
-end)            
