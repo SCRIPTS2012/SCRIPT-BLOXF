@@ -1,0 +1,149 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Orbit GUI",
+   LoadingTitle = "Đang tải...",
+   LoadingSubtitle = "bởi Ví dụ",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil,
+      FileName = "OrbitGUI"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
+   KeySystem = false,
+   KeySettings = {
+      Title = "Key System",
+      Subtitle = "Nhập khóa",
+      Note = "Không có khóa",
+      FileName = "OrbitKey",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = "1234"
+   }
+})
+
+local MainTab = Window:CreateTab("Orbit Controls", 4483362458)
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local orbiting = false
+local bodyVelocity, bodyAngular
+
+-- Giá trị trung tâm quỹ đạo (có thể điều chỉnh bằng slider)
+local centerPos = {
+   X = humanoidRootPart.Position.X,
+   Y = humanoidRootPart.Position.Y,
+   Z = humanoidRootPart.Position.Z
+}
+
+-- Nút bật/tắt Orbit
+MainTab:CreateToggle({
+   Name = "Enable Orbit",
+   CurrentValue = false,
+   Flag = "OrbitToggle",
+   Callback = function(value)
+      orbiting = value
+      if orbiting then
+         -- Tạo BodyVelocity và BodyAngularVelocity khi bật
+         bodyVelocity = Instance.new("BodyVelocity")
+         bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+         bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+         bodyVelocity.Parent = humanoidRootPart
+
+         bodyAngular = Instance.new("BodyAngularVelocity")
+         bodyAngular.AngularVelocity = Vector3.new(0, speedValue, 0)
+         bodyAngular.MaxTorque = Vector3.new(0, math.huge, 0)
+         bodyAngular.Parent = humanoidRootPart
+
+         spawn(function()
+            while orbiting and bodyVelocity.Parent do
+               wait()
+               local angle = tick() * speedValue
+               local x = centerPos.X + math.cos(angle) * radiusValue
+               local z = centerPos.Z + math.sin(angle) * radiusValue
+               local targetPos = Vector3.new(x, centerPos.Y, z)
+               bodyVelocity.Velocity = (targetPos - humanoidRootPart.Position).Unit * 16
+            end
+         end)
+      else
+         -- Xóa BodyVelocity và BodyAngularVelocity khi tắt
+         if bodyVelocity then bodyVelocity:Destroy() end
+         if bodyAngular then bodyAngular:Destroy() end
+      end
+   end,
+})
+
+-- Slider điều chỉnh bán kính
+local radiusValue = 50
+MainTab:CreateSlider({
+   Name = "Radius",
+   Range = {10, 100},
+   Increment = 1,
+   Suffix = "Studs",
+   CurrentValue = 50,
+   Flag = "RadiusSlider",
+   Callback = function(value)
+      radiusValue = value
+   end,
+})
+
+-- Slider điều chỉnh tốc độ
+local speedValue = 2
+MainTab:CreateSlider({
+   Name = "Speed",
+   Range = {0.5, 5},
+   Increment = 0.1,
+   Suffix = "Rad/s",
+   CurrentValue = 2,
+   Flag = "SpeedSlider",
+   Callback = function(value)
+      speedValue = value
+      if bodyAngular then
+         bodyAngular.AngularVelocity = Vector3.new(0, speedValue, 0)
+      end
+   end,
+})
+
+-- Slider điều chỉnh X
+MainTab:CreateSlider({
+   Name = "Center X",
+   Range = {-100, 100},
+   Increment = 1,
+   Suffix = "Studs",
+   CurrentValue = centerPos.X,
+   Flag = "CenterXSlider",
+   Callback = function(value)
+      centerPos.X = value
+   end,
+})
+
+-- Slider điều chỉnh Y
+MainTab:CreateSlider({
+   Name = "Center Y",
+   Range = {0, 50},
+   Increment = 1,
+   Suffix = "Studs",
+   CurrentValue = centerPos.Y,
+   Flag = "CenterYSlider",
+   Callback = function(value)
+      centerPos.Y = value
+   end,
+})
+
+-- Slider điều chỉnh Z
+MainTab:CreateSlider({
+   Name = "Center Z",
+   Range = {-100, 100},
+   Increment = 1,
+   Suffix = "Studs",
+   CurrentValue = centerPos.Z,
+   Flag = "CenterZSlider",
+   Callback = function(value)
+      centerPos.Z = value
+   end,
+})
