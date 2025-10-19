@@ -1,4 +1,4 @@
--- Blox Fruits Exploit Script with Orion UI (Update 27, All Features + Race/V4)
+-- Blox Fruits Exploit Script with Rayfield UI (Update 27, All Features + Race/V4)
 -- Features: Auto Farm, Aim/ESP, Teleport/Sea, Server Check, Race/V4 (V2/V3/V4 All Races), Shader, FPS, Lag Reduction
 -- Key: Voidteam_hub
 -- Tham khảo: blox-fruits.fandom.com (web:3, web:4, web:5), bloxfruitsscripts.net (web:0), GitHub yfyuy (web:6, web:12)
@@ -21,7 +21,7 @@ Frame.Parent = KeyWindow
 
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 30)
-Title.Text = "NHẬP VÔ ĐÂY NÈ BẠN"
+Title.Text = "Nhập Key để Mở Hub"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 Title.TextScaled = true
@@ -31,7 +31,7 @@ local Input = Instance.new("TextBox")
 Input.Size = UDim2.new(0.8, 0, 0, 30)
 Input.Position = UDim2.new(0.1, 0, 0.3, 0)
 Input.Text = ""
-Input.PlaceholderText = "GOOD BOY 🤓☝(Voidteam_hub)..."
+Input.PlaceholderText = "Nhập key (Voidteam_hub)..."
 Input.TextColor3 = Color3.fromRGB(255, 255, 255)
 Input.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 Input.TextScaled = true
@@ -50,10 +50,10 @@ Submit.MouseButton1Click:Connect(function()
     if Input.Text == validKey then
         keyEntered = true
         KeyWindow:Destroy()
-        print("CHÚC MỪNG EM! 30/4/1975 VTHUB ĐANG MỞ...")
+        print("Key đúng! Mở Hub...")
     else
         Input.Text = ""
-        Input.PlaceholderText = "phải gì phải chịu đừng có kêu! Thử lại đi ku (Voidteam_hub)."
+        Input.PlaceholderText = "Key sai! Thử lại (Voidteam_hub)."
     end
 end)
 
@@ -61,18 +61,19 @@ while not keyEntered do
     wait(0.1)
 end
 
--- Load Orion UI
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+-- Load Rayfield UI
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Interface/Rayfield-Interface-Suite/main/Rayfield'))()
 
-local Window = OrionLib:MakeWindow({
-    Name = "Voidteam Hub",
-    HidePremium = false,
-    SaveConfig = true,
-    ConfigFolder = "BloxVoidteamHub",
-    IntroEnabled = true,
-    IntroText = "Voidteam Hub Loaded!",
-    IntroIcon = "rbxassetid://4483345998",
-    Icon = "rbxassetid://4483345998"
+local Window = Rayfield:CreateWindow({
+    Name = "Blox Fruits Voidteam Hub v2025",
+    LoadingTitle = "Voidteam Hub",
+    LoadingSubtitle = "Loading Features...",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "BloxVoidteamHub",
+        FileName = "Config"
+    },
+    KeySystem = false -- Already handled manually
 })
 
 -- Services
@@ -265,10 +266,10 @@ local function checkServerMobsAndBosses()
     end
 
     local suggestion = _G.PlayerLevel < 700 and "Farm First Sea mobs" or (_G.PlayerLevel < 1500 and "Farm Second Sea mobs" or "Farm Third Sea bosses")
-    OrionLib:MakeNotification({
-        Name = "Server Check",
+    Rayfield:Notify({
+        Title = "Server Check",
         Content = string.format("Boss: %d | Mobs: Low(%d) Mid(%d) High(%d) | Gợi ý: %s", bossCount, mobCount.low, mobCount.mid, mobCount.high, suggestion),
-        Time = 5
+        Duration = 5
     })
 end
 
@@ -317,10 +318,10 @@ local function applyLagReduction()
                 v.Enabled = false
             end
         end
-        OrionLib:MakeNotification({
-            Name = "Lag Reduction",
+        Rayfield:Notify({
+            Title = "Lag Reduction",
             Content = "Đã bật! Tắt shadows và particle effects.",
-            Time = 3
+            Duration = 3
         })
     else
         Lighting.GlobalShadows = true
@@ -330,10 +331,10 @@ local function applyLagReduction()
                 v.Enabled = true
             end
         end
-        OrionLib:MakeNotification({
-            Name = "Lag Reduction",
+        Rayfield:Notify({
+            Title = "Lag Reduction",
             Content = "Đã tắt! Khôi phục cài đặt gốc.",
-            Time = 3
+            Duration = 3
         })
     end
 end
@@ -361,10 +362,10 @@ spawn(function()
                             VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                         end
                     end
-                    OrionLib:MakeNotification({
-                        Name = "Auto Human V2",
+                    Rayfield:Notify({
+                        Title = "Auto Human V2",
                         Content = "Farming kills or Beli for Human V2...",
-                        Time = 3
+                        Duration = 3
                     })
                 elseif hasV2 and not hasV3 then
                     local bosses = {"Diamond", "Jeremy", "Fajita"}
@@ -382,10 +383,10 @@ spawn(function()
                     end
                     if not bossFound then
                         tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
-                        OrionLib:MakeNotification({
-                            Name = "Auto Human V3",
+                        Rayfield:Notify({
+                            Title = "Auto Human V3",
                             Content = "No bosses found! Moving to Arowe for V3.",
-                            Time = 3
+                            Duration = 3
                         })
                     end
                 end
@@ -405,10 +406,10 @@ spawn(function()
                             VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                         end
                     end
-                    OrionLib:MakeNotification({
-                        Name = "Auto Mink V2",
+                    Rayfield:Notify({
+                        Title = "Auto Mink V2",
                         Content = "Farming kills or Beli for Mink V2...",
-                        Time = 3
+                        Duration = 3
                     })
                 elseif hasV2 and not hasV3 then
                     local bosses = {"Diamond", "Jeremy", "Fajita"}
@@ -426,10 +427,10 @@ spawn(function()
                     end
                     if not bossFound then
                         tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
-                        OrionLib:MakeNotification({
-                            Name = "Auto Mink V3",
+                        Rayfield:Notify({
+                            Title = "Auto Mink V3",
                             Content = "No bosses found! Moving to Arowe for V3.",
-                            Time = 3
+                            Duration = 3
                         })
                     end
                 end
@@ -449,10 +450,10 @@ spawn(function()
                             VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                         end
                     end
-                    OrionLib:MakeNotification({
-                        Name = "Auto Skypian V2",
+                    Rayfield:Notify({
+                        Title = "Auto Skypian V2",
                         Content = "Farming kills or Beli for Skypian V2...",
-                        Time = 3
+                        Duration = 3
                     })
                 elseif hasV2 and not hasV3 then
                     local bosses = {"Diamond", "Jeremy", "Fajita"}
@@ -470,10 +471,10 @@ spawn(function()
                     end
                     if not bossFound then
                         tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
-                        OrionLib:MakeNotification({
-                            Name = "Auto Skypian V3",
+                        Rayfield:Notify({
+                            Title = "Auto Skypian V3",
                             Content = "No bosses found! Moving to Arowe for V3.",
-                            Time = 3
+                            Duration = 3
                         })
                     end
                 end
@@ -493,10 +494,10 @@ spawn(function()
                             VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                         end
                     end
-                    OrionLib:MakeNotification({
-                        Name = "Auto Fishman V2",
+                    Rayfield:Notify({
+                        Title = "Auto Fishman V2",
                         Content = "Farming kills or Beli for Fishman V2...",
-                        Time = 3
+                        Duration = 3
                     })
                 elseif hasV2 and not hasV3 then
                     local bosses = {"Diamond", "Jeremy", "Fajita"}
@@ -514,10 +515,10 @@ spawn(function()
                     end
                     if not bossFound then
                         tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
-                        OrionLib:MakeNotification({
-                            Name = "Auto Fishman V3",
+                        Rayfield:Notify({
+                            Title = "Auto Fishman V3",
                             Content = "No bosses found! Moving to Arowe for V3.",
-                            Time = 3
+                            Duration = 3
                         })
                     end
                 end
@@ -552,10 +553,10 @@ spawn(function()
                     end
                     if not bossFound then
                         tweenToPosition(rootPart, TeleportLocations["Sea 2 - Graveyard (Cursed Captain for Ghoul)"], 2)
-                        OrionLib:MakeNotification({
-                            Name = "Auto Ghoul",
+                        Rayfield:Notify({
+                            Title = "Auto Ghoul",
                             Content = "Cursed Captain not found! Moving to Graveyard.",
-                            Time = 3
+                            Duration = 3
                         })
                     end
                 end
@@ -572,19 +573,19 @@ spawn(function()
                                 VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                             end
                         end
-                        OrionLib:MakeNotification({
-                            Name = "Auto Ghoul V2",
+                        Rayfield:Notify({
+                            Title = "Auto Ghoul V2",
                             Content = "Farming Ectoplasm for Ghoul V2...",
-                            Time = 3
+                            Duration = 3
                         })
                     else
                         tweenToPosition(rootPart, TeleportLocations["Sea 2 - Cursed Ship (Experimic for Ghoul V2)"], 2)
                         -- Placeholder: Fire remote for Ghoul V2
                         -- game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyGhoulV2")
-                        OrionLib:MakeNotification({
-                            Name = "Auto Ghoul V2",
+                        Rayfield:Notify({
+                            Title = "Auto Ghoul V2",
                             Content = "Attempting to upgrade to Ghoul V2 at Experimic!",
-                            Time = 3
+                            Duration = 3
                         })
                     end
                 end
@@ -608,10 +609,10 @@ spawn(function()
                         tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
                         -- Placeholder: Fire remote for Ghoul V3
                         -- game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyGhoulV3")
-                        OrionLib:MakeNotification({
-                            Name = "Auto Ghoul V3",
+                        Rayfield:Notify({
+                            Title = "Auto Ghoul V3",
                             Content = "No bosses found! Moving to Arowe for V3.",
-                            Time = 3
+                            Duration = 3
                         })
                     end
                 end
@@ -645,10 +646,10 @@ spawn(function()
                     end
                     if not bossFound then
                         tweenToPosition(rootPart, TeleportLocations["Sea 2 - Hot and Cold (Order/Law for Cyborg)"], 2)
-                        OrionLib:MakeNotification({
-                            Name = "Auto Cyborg",
+                        Rayfield:Notify({
+                            Title = "Auto Cyborg",
                             Content = "Order not found! Moving to Hot and Cold.",
-                            Time = 3
+                            Duration = 3
                         })
                     end
                 end
@@ -658,10 +659,10 @@ spawn(function()
                     tweenToPosition(rootPart, TeleportLocations["Sea 2 - Hot and Cold (Order/Law for Cyborg)"], 2)
                     -- Placeholder: Fire remote for Cyborg V2
                     -- game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyCyborgV2")
-                    OrionLib:MakeNotification({
-                        Name = "Auto Cyborg V2",
+                    Rayfield:Notify({
+                        Title = "Auto Cyborg V2",
                         Content = "Attempting to upgrade to Cyborg V2 at Mad Scientist!",
-                        Time = 3
+                        Duration = 3
                     })
                 end
 
@@ -684,10 +685,10 @@ spawn(function()
                         tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
                         -- Placeholder: Fire remote for Cyborg V3
                         -- game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyCyborgV3")
-                        OrionLib:MakeNotification({
-                            Name = "Auto Cyborg V3",
+                        Rayfield:Notify({
+                            Title = "Auto Cyborg V3",
                             Content = "No bosses found! Moving to Arowe for V3.",
-                            Time = 3
+                            Duration = 3
                         })
                     end
                 end
@@ -710,12 +711,11 @@ spawn(function()
 
                 -- Farm Mirror Fractal (Sea Events)
                 if not hasMirrorFractal then
-                    -- Placeholder: Trigger Sea Event
                     tweenToPosition(rootPart, CFrame.new(0, 20, 0), 2) -- Move to sea
-                    OrionLib:MakeNotification({
-                        Name = "Auto V4",
+                    Rayfield:Notify({
+                        Title = "Auto V4",
                         Content = "Farming Mirror Fractal from Sea Events...",
-                        Time = 3
+                        Duration = 3
                     })
                     wait(5) -- Simulate Sea Event
                 end
@@ -752,18 +752,18 @@ spawn(function()
                                 VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                             end
                         end
-                        OrionLib:MakeNotification({
-                            Name = "Auto V4 Human",
+                        Rayfield:Notify({
+                            Title = "Auto V4 Human",
                             Content = "Completing Trial of Strength...",
-                            Time = 3
+                            Duration = 3
                         })
                     elseif currentRace == "Mink" then
                         -- Trial of Speed
                         tweenToPosition(rootPart, TeleportLocations["Sea 3 - Temple of Time (V4 Trial)"] * CFrame.new(0, 5, 0), 0.5)
-                        OrionLib:MakeNotification({
-                            Name = "Auto V4 Mink",
+                        Rayfield:Notify({
+                            Title = "Auto V4 Mink",
                             Content = "Completing Trial of Speed...",
-                            Time = 3
+                            Duration = 3
                         })
                     elseif currentRace == "Skypian" then
                         -- Trial of the King
@@ -775,18 +775,18 @@ spawn(function()
                                 VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                             end
                         end
-                        OrionLib:MakeNotification({
-                            Name = "Auto V4 Skypian",
+                        Rayfield:Notify({
+                            Title = "Auto V4 Skypian",
                             Content = "Completing Trial of the King...",
-                            Time = 3
+                            Duration = 3
                         })
                     elseif currentRace == "Fishman" then
                         -- Trial of Water
                         tweenToPosition(rootPart, TeleportLocations["Sea 3 - Temple of Time (V4 Trial)"] * CFrame.new(0, -10, 0), 0.5)
-                        OrionLib:MakeNotification({
-                            Name = "Auto V4 Fishman",
+                        Rayfield:Notify({
+                            Title = "Auto V4 Fishman",
                             Content = "Completing Trial of Water...",
-                            Time = 3
+                            Duration = 3
                         })
                     elseif currentRace == "Ghoul" then
                         -- Trial of Carnage
@@ -798,10 +798,10 @@ spawn(function()
                                 VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                             end
                         end
-                        OrionLib:MakeNotification({
-                            Name = "Auto V4 Ghoul",
+                        Rayfield:Notify({
+                            Title = "Auto V4 Ghoul",
                             Content = "Completing Trial of Carnage...",
-                            Time = 3
+                            Duration = 3
                         })
                     elseif currentRace == "Cyborg" then
                         -- Trial of the Machine
@@ -813,18 +813,18 @@ spawn(function()
                                 VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                             end
                         end
-                        OrionLib:MakeNotification({
-                            Name = "Auto V4 Cyborg",
+                        Rayfield:Notify({
+                            Title = "Auto V4 Cyborg",
                             Content = "Completing Trial of the Machine...",
-                            Time = 3
+                            Duration = 3
                         })
                     end
                     -- Placeholder: Fire remote for V4
                     -- game.ReplicatedStorage.Remotes.CommF_:InvokeServer("AwakenV4")
-                    OrionLib:MakeNotification({
-                        Name = "Auto V4",
+                    Rayfield:Notify({
+                        Title = "Auto V4",
                         Content = "Attempting to upgrade to V4 at Temple of Time!",
-                        Time = 3
+                        Duration = 3
                     })
                 end
             end
@@ -962,202 +962,178 @@ spawn(function()
 end)
 
 -- UI: Auto Farm Tab
-local FarmTab = Window:MakeTab({
-    Name = "Auto Farm",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local FarmTab = Window:CreateTab("Auto Farm", "4483345998")
 
-local FarmSection = FarmTab:AddSection({ Name = "Farm Controls" })
+FarmTab:CreateSection("Farm Controls")
 
-FarmTab:AddToggle({
+FarmTab:CreateToggle({
     Name = "Bật/Tắt Auto Farm",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "MainFarmToggle",
     Callback = function(Value)
         _G.AutoFarmEnabled = Value
-        OrionLib:MakeNotification({
-            Name = "Auto Farm",
+        Rayfield:Notify({
+            Title = "Auto Farm",
             Content = Value and "Đã bật!" or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-FarmTab:AddToggle({
+FarmTab:CreateToggle({
     Name = "Farm Mục Tiêu Gần (Aura)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "NearbyToggle",
     Callback = function(Value)
         _G.FarmNearby = Value
     end
 })
 
-FarmTab:AddToggle({
+FarmTab:CreateToggle({
     Name = "Farm Nguyên Liệu (Chests/Bones)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "MaterialsToggle",
     Callback = function(Value)
         _G.FarmMaterials = Value
     end
 })
 
-FarmTab:AddToggle({
+FarmTab:CreateToggle({
     Name = "Farm Boss",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "BossToggle",
     Callback = function(Value)
         _G.FarmBoss = Value
     end
 })
 
-FarmTab:AddSlider({
+FarmTab:CreateSlider({
     Name = "Farm Delay",
-    Min = 0.1,
-    Max = 2,
-    Default = 0.5,
-    Color = Color3.fromRGB(255, 100, 100),
+    Range = {0.1, 2},
     Increment = 0.1,
-    ValueName = "Seconds",
+    Suffix = "Seconds",
+    CurrentValue = 0.5,
+    Flag = "FarmDelay",
     Callback = function(Value)
         _G.FarmDelay = Value
     end
 })
 
 -- UI: Aim/ESP Tab
-local AimESPTab = Window:MakeTab({
-    Name = "Aim/ESP",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local AimESPTab = Window:CreateTab("Aim/ESP", "4483345998")
 
-local AimESPSection = AimESPTab:AddSection({ Name = "Aim & ESP Controls" })
+AimESPTab:CreateSection("Aim & ESP Controls")
 
-AimESPTab:AddToggle({
+AimESPTab:CreateToggle({
     Name = "Bật/Tắt ESP (Hologram, Name, Distance)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "ESPToggle",
     Callback = function(Value)
         _G.ESPEnabled = Value
         updateESP()
-        OrionLib:MakeNotification({
-            Name = "ESP",
+        Rayfield:Notify({
+            Title = "ESP",
             Content = Value and "Đã bật!" or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-AimESPTab:AddToggle({
+AimESPTab:CreateToggle({
     Name = "Aim Skill (Tự nhắm kỹ năng)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "AimSkillToggle",
     Callback = function(Value)
         _G.AimSkill = Value
-        OrionLib:MakeNotification({
-            Name = "Aim Skill",
+        Rayfield:Notify({
+            Title = "Aim Skill",
             Content = Value and "Đã bật!" or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-AimESPTab:AddToggle({
+AimESPTab:CreateToggle({
     Name = "Aim Tap (Nhắm nhanh)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "AimTapToggle",
     Callback = function(Value)
         _G.AimTap = Value
-        OrionLib:MakeNotification({
-            Name = "Aim Tap",
+        Rayfield:Notify({
+            Title = "Aim Tap",
             Content = Value and "Đã bật!" or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-AimESPTab:AddToggle({
+AimESPTab:CreateToggle({
     Name = "Aim Gun (Nhắm súng)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "AimGunToggle",
     Callback = function(Value)
         _G.AimGun = Value
-        OrionLib:MakeNotification({
-            Name = "Aim Gun",
+        Rayfield:Notify({
+            Title = "Aim Gun",
             Content = Value and "Đã bật!" or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-AimESPTab:AddToggle({
+AimESPTab:CreateToggle({
     Name = "Aim Gần Nhất",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "AimNearToggle",
     Callback = function(Value)
         _G.AimNear = Value
         if Value then _G.AimFar = false end
-        OrionLib:MakeNotification({
-            Name = "Aim Gần",
+        Rayfield:Notify({
+            Title = "Aim Gần",
             Content = Value and "Đã bật!" or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-AimESPTab:AddToggle({
+AimESPTab:CreateToggle({
     Name = "Aim Xa Nhất",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "AimFarToggle",
     Callback = function(Value)
         _G.AimFar = Value
         if Value then _G.AimNear = false end
-        OrionLib:MakeNotification({
-            Name = "Aim Xa",
+        Rayfield:Notify({
+            Title = "Aim Xa",
             Content = Value and "Đã bật!" or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-AimESPTab:AddSlider({
+AimESPTab:CreateSlider({
     Name = "Aim Range",
-    Min = 50,
-    Max = 1000,
-    Default = 200,
-    Color = Color3.fromRGB(255, 100, 100),
+    Range = {50, 1000},
     Increment = 10,
-    ValueName = "Studs",
+    Suffix = "Studs",
+    CurrentValue = 200,
+    Flag = "AimRange",
     Callback = function(Value)
         _G.AimRange = Value
-        OrionLib:MakeNotification({
-            Name = "Aim Range",
+        Rayfield:Notify({
+            Title = "Aim Range",
             Content = "Đặt phạm vi aim: " .. Value .. " studs",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
 -- UI: Teleport/Sea Tab
-local TeleTab = Window:MakeTab({
-    Name = "Teleport/Sea",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local TeleTab = Window:CreateTab("Teleport/Sea", "4483345998")
 
-local TeleSection = TeleTab:AddSection({ Name = "All Islands & Seas (Tween, Level Info from Wiki)" })
+TeleTab:CreateSection("All Islands & Seas (Tween, Level Info from Wiki)")
 
-TeleTab:AddDropdown({
+TeleTab:CreateDropdown({
     Name = "Chọn Vị Trí Teleport",
     Options = {
         "Sea 1 - Starter Island (Lv 0-15)", "Sea 1 - Jungle (Lv 15-30)", "Sea 1 - Pirate Village (Lv 30-60)",
@@ -1172,209 +1148,188 @@ TeleTab:AddDropdown({
         "Sea 2 - Cursed Ship (Experimic for Ghoul V2)", "Sea 2 - Mansion (Arowe for V3)",
         "Sea 3 - Temple of Time (V4 Trial)"
     },
-    Default = "Sea 1 - Starter Island (Lv 0-15)",
+    CurrentOption = "Sea 1 - Starter Island (Lv 0-15)",
+    Flag = "TeleportLocation",
     Callback = function(Option)
         local character = player.Character
         if character and character:FindFirstChild("HumanoidRootPart") then
             local levelInfo = Option:match("%(([^)]+)%)") or "Unknown Level"
             tweenToPosition(character.HumanoidRootPart, TeleportLocations[Option], 2)
-            OrionLib:MakeNotification({
-                Name = "Teleport",
+            Rayfield:Notify({
+                Title = "Teleport",
                 Content = "Đã di chuyển đến " .. Option .. " (Level: " .. levelInfo .. ")!",
-                Time = 3
+                Duration = 3
             })
         end
     end
 })
 
 -- UI: Race/V4 Tab
-local RaceV4Tab = Window:MakeTab({
-    Name = "Race/V4",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local RaceV4Tab = Window:CreateTab("Race/V4", "4483345998")
 
-local RaceV4Section = RaceV4Tab:AddSection({ Name = "Auto Race Upgrades (V2/V3/V4)" })
+RaceV4Tab:CreateSection("Auto Race Upgrades (V2/V3/V4)")
 
-RaceV4Tab:AddToggle({
+RaceV4Tab:CreateToggle({
     Name = "Auto Human (V2/V3/V4)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "AutoHumanToggle",
     Callback = function(Value)
         _G.AutoHuman = Value
-        OrionLib:MakeNotification({
-            Name = "Auto Human",
+        Rayfield:Notify({
+            Title = "Auto Human",
             Content = Value and "Đã bật! Farm V2/V3/V4 for Human." or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-RaceV4Tab:AddToggle({
+RaceV4Tab:CreateToggle({
     Name = "Auto Mink (V2/V3/V4)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "AutoMinkToggle",
     Callback = function(Value)
         _G.AutoMink = Value
-        OrionLib:MakeNotification({
-            Name = "Auto Mink",
+        Rayfield:Notify({
+            Title = "Auto Mink",
             Content = Value and "Đã bật! Farm V2/V3/V4 for Mink." or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-RaceV4Tab:AddToggle({
+RaceV4Tab:CreateToggle({
     Name = "Auto Skypian (V2/V3/V4)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "AutoSkypianToggle",
     Callback = function(Value)
         _G.AutoSkypian = Value
-        OrionLib:MakeNotification({
-            Name = "Auto Skypian",
+        Rayfield:Notify({
+            Title = "Auto Skypian",
             Content = Value and "Đã bật! Farm V2/V3/V4 for Skypian." or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-RaceV4Tab:AddToggle({
+RaceV4Tab:CreateToggle({
     Name = "Auto Fishman (V2/V3/V4)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "AutoFishmanToggle",
     Callback = function(Value)
         _G.AutoFishman = Value
-        OrionLib:MakeNotification({
-            Name = "Auto Fishman",
+        Rayfield:Notify({
+            Title = "Auto Fishman",
             Content = Value and "Đã bật! Farm V2/V3/V4 for Fishman." or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
 if isInSea2or3() then
-    RaceV4Tab:AddToggle({
+    RaceV4Tab:CreateToggle({
         Name = "Auto Ghoul (V2/V3/V4)",
-        Default = false,
-        Save = true,
+        CurrentValue = false,
         Flag = "AutoGhoulToggle",
         Callback = function(Value)
             _G.AutoGhoul = Value
-            OrionLib:MakeNotification({
-                Name = "Auto Ghoul",
+            Rayfield:Notify({
+                Title = "Auto Ghoul",
                 Content = Value and "Đã bật! Farm Torch, Ectoplasm, V2/V3/V4." or "Đã tắt!",
-                Time = 3
+                Duration = 3
             })
         end
     })
 
-    RaceV4Tab:AddToggle({
+    RaceV4Tab:CreateToggle({
         Name = "Auto Cyborg (V2/V3/V4)",
-        Default = false,
-        Save = true,
+        CurrentValue = false,
         Flag = "AutoCyborgToggle",
         Callback = function(Value)
             _G.AutoCyborg = Value
-            OrionLib:MakeNotification({
-                Name = "Auto Cyborg",
+            Rayfield:Notify({
+                Title = "Auto Cyborg",
                 Content = Value and "Đã bật! Farm Core Brain, V2/V3/V4." or "Đã tắt!",
-                Time = 3
+                Duration = 3
             })
         end
     })
 
-    RaceV4Tab:AddToggle({
+    RaceV4Tab:CreateToggle({
         Name = "Auto V4 (All Races)",
-        Default = false,
-        Save = true,
+        CurrentValue = false,
         Flag = "AutoV4Toggle",
         Callback = function(Value)
             _G.AutoV4 = Value
-            OrionLib:MakeNotification({
-                Name = "Auto V4",
+            Rayfield:Notify({
+                Title = "Auto V4",
                 Content = Value and "Đã bật! Farm Trials and Mirror Fractal for V4." or "Đã tắt!",
-                Time = 3
+                Duration = 3
             })
         end
     })
 else
-    RaceV4Tab:AddLabel("Ghoul/Cyborg/V4 only available in Sea 2/3 (Level 700+)")
+    RaceV4Tab:CreateLabel("Ghoul/Cyborg/V4 only available in Sea 2/3 (Level 700+)")
 end
 
 -- UI: Server Check Tab
-local CheckTab = Window:MakeTab({
-    Name = "Server Check",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local CheckTab = Window:CreateTab("Server Check", "4483345998")
 
-local CheckSection = CheckTab:AddSection({ Name = "Auto Update Check" })
+CheckTab:CreateSection("Auto Update Check")
 
-CheckTab:AddToggle({
+CheckTab:CreateToggle({
     Name = "Bật/Tắt Tự Động Check Server",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "CheckToggle",
     Callback = function(Value)
         _G.AutoCheckEnabled = Value
         if Value then checkServerMobsAndBosses() end
-        OrionLib:MakeNotification({
-            Name = "Server Check",
+        Rayfield:Notify({
+            Title = "Server Check",
             Content = Value and "Đã bật auto check!" or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-CheckTab:AddButton({
+CheckTab:CreateButton({
     Name = "Check Ngay (Boss & Mobs by Level)",
     Callback = function()
         checkServerMobsAndBosses()
     end
 })
 
-local LevelLabel = CheckTab:AddLabel("Player Level: Loading...")
+FPSLabel = CheckTab:CreateLabel("Player Level: Loading...")
 spawn(function()
     while true do
         updatePlayerLevel()
-        LevelLabel:Set("Player Level: " .. _G.PlayerLevel)
+        FPSLabel:Set("Player Level: " .. _G.PlayerLevel)
         wait(5)
     end
 end)
 
 -- UI: Special Tab (Shader, FPS, Lag Reduction)
-local SpecialTab = Window:MakeTab({
-    Name = "Đặc Biệt",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+local SpecialTab = Window:CreateTab("Đặc Biệt", "4483345998")
 
-local SpecialSection = SpecialTab:AddSection({ Name = "Shader & Performance" })
+SpecialTab:CreateSection("Shader & Performance")
 
-SpecialTab:AddToggle({
+SpecialTab:CreateToggle({
     Name = "Bật/Tắt Shader (Bloom, Color, Blur)",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "ShaderToggle",
     Callback = function(Value)
         _G.ShaderEnabled = Value
         applyShader()
-        OrionLib:MakeNotification({
-            Name = "Shader",
+        Rayfield:Notify({
+            Title = "Shader",
             Content = Value and "Đã bật! Áp dụng Bloom, Color Correction, Blur." or "Đã tắt!",
-            Time = 3
+            Duration = 3
         })
     end
 })
 
-SpecialTab:AddToggle({
+SpecialTab:CreateToggle({
     Name = "Bật/Tắt Giảm Lag",
-    Default = false,
-    Save = true,
+    CurrentValue = false,
     Flag = "LagReductionToggle",
     Callback = function(Value)
         _G.LagReductionEnabled = Value
@@ -1382,16 +1337,15 @@ SpecialTab:AddToggle({
     end
 })
 
-FPSLabel = SpecialTab:AddLabel("FPS: Loading...")
+FPSLabel = SpecialTab:CreateLabel("FPS: Loading...")
 
 -- Initialize
 applyShader()
 applyLagReduction()
-OrionLib:Init()
-OrionLib:MakeNotification({
-    Name = "Hub Loaded",
+Rayfield:Notify({
+    Title = "Hub Loaded",
     Content = "Voidteam Hub ready! All features + Race/V4 (Key: Voidteam_hub).",
-    Time = 5
+    Duration = 5
 })
 
 print("Blox Fruits Voidteam Hub Loaded with Key: Voidteam_hub")
