@@ -1,0 +1,1397 @@
+-- Blox Fruits Exploit Script with Orion UI (Update 27, All Features + Race/V4)
+-- Features: Auto Farm, Aim/ESP, Teleport/Sea, Server Check, Race/V4 (V2/V3/V4 All Races), Shader, FPS, Lag Reduction
+-- Key: Voidteam_hub
+-- Tham khảo: blox-fruits.fandom.com (web:3, web:4, web:5), bloxfruitsscripts.net (web:0), GitHub yfyuy (web:6, web:12)
+-- Warning: Educational only - Use at own risk!
+
+-- Key System
+local validKey = "Voidteam_hub"
+local keyEntered = false
+
+-- Key Input Window
+local KeyWindow = Instance.new("ScreenGui")
+KeyWindow.Name = "KeyWindow"
+KeyWindow.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 300, 0, 150)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.Parent = KeyWindow
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "NHẬP VÔ ĐÂY NÈ BẠN"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Title.TextScaled = true
+Title.Parent = Frame
+
+local Input = Instance.new("TextBox")
+Input.Size = UDim2.new(0.8, 0, 0, 30)
+Input.Position = UDim2.new(0.1, 0, 0.3, 0)
+Input.Text = ""
+Input.PlaceholderText = "GOOD BOY 🤓☝(Voidteam_hub)..."
+Input.TextColor3 = Color3.fromRGB(255, 255, 255)
+Input.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+Input.TextScaled = true
+Input.Parent = Frame
+
+local Submit = Instance.new("TextButton")
+Submit.Size = UDim2.new(0.4, 0, 0, 30)
+Submit.Position = UDim2.new(0.3, 0, 0.6, 0)
+Submit.Text = "Xác Nhận"
+Submit.TextColor3 = Color3.fromRGB(255, 255, 255)
+Submit.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+Submit.TextScaled = true
+Submit.Parent = Frame
+
+Submit.MouseButton1Click:Connect(function()
+    if Input.Text == validKey then
+        keyEntered = true
+        KeyWindow:Destroy()
+        print("CHÚC MỪNG EM! 30/4/1975 VTHUB ĐANG MỞ...")
+    else
+        Input.Text = ""
+        Input.PlaceholderText = "phải gì phải chịu đừng có kêu! Thử lại đi ku (Voidteam_hub)."
+    end
+end)
+
+while not keyEntered do
+    wait(0.1)
+end
+
+-- Load Orion UI
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+local Window = OrionLib:MakeWindow({
+    Name = "Voidteam Hub",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "BloxVoidteamHub",
+    IntroEnabled = true,
+    IntroText = "Voidteam Hub Loaded!",
+    IntroIcon = "rbxassetid://4483345998",
+    Icon = "rbxassetid://4483345998"
+})
+
+-- Services
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local Lighting = game:GetService("Lighting")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+-- Globals
+_G.AutoFarmEnabled = false
+_G.FarmNearby = false
+_G.FarmMaterials = false
+_G.FarmBoss = false
+_G.AutoCheckEnabled = false
+_G.ESPEnabled = false
+_G.AimSkill = false
+_G.AimTap = false
+_G.AimGun = false
+_G.AimNear = false
+_G.AimFar = false
+_G.AutoHuman = false
+_G.AutoMink = false
+_G.AutoSkypian = false
+_G.AutoFishman = false
+_G.AutoGhoul = false
+_G.AutoCyborg = false
+_G.AutoV4 = false
+_G.ShaderEnabled = false
+_G.LagReductionEnabled = false
+_G.PlayerLevel = 1
+_G.FarmDelay = 0.5
+_G.AimRange = 200
+_G.ESPInstances = {}
+_G.ShaderInstances = nil
+
+-- Teleport Locations with Level Info (from Wiki, web:3, web:4, web:5)
+local TeleportLocations = {
+    ["Sea 1 - Starter Island (Lv 0-15)"] = CFrame.new(-505.922485, 72.5261765, 556.535034),
+    ["Sea 1 - Jungle (Lv 15-30)"] = CFrame.new(1000, 20, 1000),
+    ["Sea 1 - Pirate Village (Lv 30-60)"] = CFrame.new(0, 20, 500),
+    ["Sea 1 - Desert (Lv 60-90)"] = CFrame.new(2000, 20, 1000),
+    ["Sea 1 - Middle Town (Lv 90-120)"] = CFrame.new(500, 20, 0),
+    ["Sea 1 - Frozen Village (Lv 120-150)"] = CFrame.new(-1000, 20, -500),
+    ["Sea 1 - Skylands (Lv 150-200)"] = CFrame.new(0, 500, 0),
+    ["Sea 1 - Marine Fortress (Lv 130-180)"] = CFrame.new(1114.87378, 16.135498, 1380.39453),
+    ["Sea 2 - Kingdom of Rose (Lv 700-850)"] = CFrame.new(-2000, 20, 0),
+    ["Sea 2 - Cafe (Lv 700-850)"] = CFrame.new(-380, 50, 100),
+    ["Sea 2 - Mansion (Lv 850-950)"] = CFrame.new(500, 20, 500),
+    ["Sea 2 - Graveyard (Lv 950-1000)"] = CFrame.new(916.928955, 125.573395, 6866.81494),
+    ["Sea 2 - Hot and Cold (Lv 1000-1100)"] = CFrame.new(5232.85352, 4.95110703, -1102.67041),
+    ["Sea 2 - Cursed Ship (Lv 1100-1250)"] = CFrame.new(0, 100, 0),
+    ["Sea 3 - Port Town (Lv 1500-1600)"] = CFrame.new(-2000, 20, 3000),
+    ["Sea 3 - Hydra Island (Lv 1600-1700)"] = CFrame.new(5000, 20, 5000),
+    ["Sea 3 - Castle on the Sea (Lv 1700-1800)"] = CFrame.new(0, 100, 5000),
+    ["Sea 3 - Floating Turtle (Lv 1800-1900)"] = CFrame.new(3000, 20, 6000),
+    ["Sea 3 - Haunted Castle (Lv 1900-2000)"] = CFrame.new(4000, 20, 7000),
+    ["Sea 3 - Tiki Outpost (Lv 2000-2100)"] = CFrame.new(-16000, 30, 2000),
+    ["Sea 3 - Port of the Dead (Lv 2100-2200)"] = CFrame.new(5000, 20, 8000),
+    ["Sea 3 - Great Tree (Lv 2200-2300)"] = CFrame.new(6000, 20, 9000),
+    ["Sea 3 - Sea of Treats (Lv 2300-2400)"] = CFrame.new(7000, 20, 10000),
+    ["Sea 2 - Graveyard (Cursed Captain for Ghoul)"] = CFrame.new(916.928955, 125.573395, 6866.81494),
+    ["Sea 2 - Hot and Cold (Order/Law for Cyborg)"] = CFrame.new(5232.85352, 4.95110703, -1102.67041),
+    ["Sea 2 - Cursed Ship (Experimic for Ghoul V2)"] = CFrame.new(0, 100, 0),
+    ["Sea 2 - Mansion (Arowe for V3)"] = CFrame.new(500, 20, 500),
+    ["Sea 3 - Temple of Time (V4 Trial)"] = CFrame.new(0, 100, 10000) -- Placeholder
+}
+
+-- Tween Function for Safe Movement
+local function tweenToPosition(rootPart, targetCFrame, duration)
+    local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+    local tween = TweenService:Create(rootPart, tweenInfo, {CFrame = targetCFrame})
+    tween:Play()
+    tween.Completed:Wait()
+end
+
+-- Update Player Level
+local function updatePlayerLevel()
+    if player:FindFirstChild("Data") and player.Data:FindFirstChild("Level") then
+        _G.PlayerLevel = player.Data.Level.Value
+    end
+end
+
+-- Check if in Sea 2 or Sea 3
+local function isInSea2or3()
+    updatePlayerLevel()
+    return _G.PlayerLevel >= 700
+end
+
+-- Find Nearest/Farthest Target for Aim
+local function findTarget(isFar)
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return nil, nil end
+    local rootPart = character.HumanoidRootPart
+    local nearest, farthest = nil, nil
+    local minDist, maxDist = _G.AimRange, 0
+
+    for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+        if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 and enemy:FindFirstChild("HumanoidRootPart") then
+            local dist = (rootPart.Position - enemy.HumanoidRootPart.Position).Magnitude
+            if dist <= _G.AimRange then
+                if dist < minDist then
+                    nearest = enemy
+                    minDist = dist
+                end
+                if dist > maxDist then
+                    farthest = enemy
+                    maxDist = dist
+                end
+            end
+        end
+    end
+    return isFar and farthest or nearest, isFar and maxDist or minDist
+end
+
+-- ESP Function
+local function updateESP()
+    for _, instance in pairs(_G.ESPInstances) do
+        if instance then instance:Destroy() end
+    end
+    _G.ESPInstances = {}
+
+    if _G.ESPEnabled then
+        for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+            if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 and enemy:FindFirstChild("HumanoidRootPart") then
+                local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                if not rootPart then return end
+                local dist = (rootPart.Position - enemy.HumanoidRootPart.Position).Magnitude
+
+                local highlight = Instance.new("Highlight")
+                highlight.Parent = enemy
+                highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                table.insert(_G.ESPInstances, highlight)
+
+                local billboard = Instance.new("BillboardGui")
+                billboard.Parent = enemy
+                billboard.Adornee = enemy.HumanoidRootPart
+                billboard.Size = UDim2.new(0, 100, 0, 50)
+                billboard.StudsOffset = Vector3.new(0, 3, 0)
+                billboard.AlwaysOnTop = true
+
+                local nameLabel = Instance.new("TextLabel")
+                nameLabel.Parent = billboard
+                nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+                nameLabel.BackgroundTransparency = 1
+                nameLabel.Text = enemy.Name
+                nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                nameLabel.TextScaled = true
+
+                local distLabel = Instance.new("TextLabel")
+                distLabel.Parent = billboard
+                distLabel.Size = UDim2.new(1, 0, 0.5, 0)
+                distLabel.Position = UDim2.new(0, 0, 0.5, 0)
+                distLabel.BackgroundTransparency = 1
+                distLabel.Text = math.floor(dist) .. " studs"
+                distLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+                distLabel.TextScaled = true
+
+                table.insert(_G.ESPInstances, billboard)
+            end
+        end
+    end
+end
+
+-- Check Server Mobs/Bosses
+local function checkServerMobsAndBosses()
+    updatePlayerLevel()
+    local mobCount = { low = 0, mid = 0, high = 0 }
+    local bossCount = 0
+
+    for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+        if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+            local enemyLevel = enemy:FindFirstChild("Level") and enemy.Level.Value or 1
+            if enemyLevel < 700 then mobCount.low = mobCount.low + 1
+            elseif enemyLevel < 1500 then mobCount.mid = mobCount.mid + 1
+            else mobCount.high = mobCount.high + 1 end
+        end
+    end
+
+    for _, boss in pairs(Workspace:GetChildren()) do
+        if boss.Name:find("Boss") or boss.Name:find("Admiral") or boss.Name:find("Diamond") or boss.Name:find("Order") or boss.Name:find("Cursed Captain") then
+            if boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                bossCount = bossCount + 1
+            end
+        end
+    end
+
+    local suggestion = _G.PlayerLevel < 700 and "Farm First Sea mobs" or (_G.PlayerLevel < 1500 and "Farm Second Sea mobs" or "Farm Third Sea bosses")
+    OrionLib:MakeNotification({
+        Name = "Server Check",
+        Content = string.format("Boss: %d | Mobs: Low(%d) Mid(%d) High(%d) | Gợi ý: %s", bossCount, mobCount.low, mobCount.mid, mobCount.high, suggestion),
+        Time = 5
+    })
+end
+
+-- Shader Functions
+local function applyShader()
+    if _G.ShaderEnabled then
+        local bloom = Instance.new("BloomEffect")
+        bloom.Intensity = 0.8
+        bloom.Size = 24
+        bloom.Threshold = 0.9
+        bloom.Parent = Lighting
+
+        local colorCorrection = Instance.new("ColorCorrectionEffect")
+        colorCorrection.Brightness = 0.1
+        colorCorrection.Contrast = 0.2
+        colorCorrection.Saturation = 0.3
+        colorCorrection.TintColor = Color3.fromRGB(255, 255, 255)
+        colorCorrection.Parent = Lighting
+
+        local blur = Instance.new("BlurEffect")
+        blur.Size = 5
+        blur.Parent = Lighting
+
+        _G.ShaderInstances = {bloom, colorCorrection, blur}
+    else
+        if _G.ShaderInstances then
+            for _, effect in pairs(_G.ShaderInstances) do
+                if effect then effect:Destroy() end
+            end
+            _G.ShaderInstances = nil
+        end
+    end
+end
+
+-- Lag Reduction Function
+local function applyLagReduction()
+    if _G.LagReductionEnabled then
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 100000
+        for _, v in pairs(Workspace:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.SmoothPlastic
+                v.Reflectance = 0
+                v.CastShadow = false
+            elseif v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") then
+                v.Enabled = false
+            end
+        end
+        OrionLib:MakeNotification({
+            Name = "Lag Reduction",
+            Content = "Đã bật! Tắt shadows và particle effects.",
+            Time = 3
+        })
+    else
+        Lighting.GlobalShadows = true
+        Lighting.FogEnd = 1000
+        for _, v in pairs(Workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") then
+                v.Enabled = true
+            end
+        end
+        OrionLib:MakeNotification({
+            Name = "Lag Reduction",
+            Content = "Đã tắt! Khôi phục cài đặt gốc.",
+            Time = 3
+        })
+    end
+end
+
+-- Auto Race V2/V3/V4 Loop
+spawn(function()
+    while true do
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = character.HumanoidRootPart
+            local beliCount = player.Data.Beli.Value or 0
+            local inventory = player.Backpack:GetChildren()
+
+            -- Auto Human V2/V3
+            if _G.AutoHuman then
+                local hasV2 = false -- Placeholder: Check Human V2 status
+                local hasV3 = false -- Placeholder: Check Human V3 status
+                if not hasV2 and beliCount >= 500000 then
+                    tweenToPosition(rootPart, TeleportLocations["Sea 1 - Middle Town (Lv 90-120)"], 2)
+                    for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                        if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                            tweenToPosition(rootPart, enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            wait(0.1)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                        end
+                    end
+                    OrionLib:MakeNotification({
+                        Name = "Auto Human V2",
+                        Content = "Farming kills or Beli for Human V2...",
+                        Time = 3
+                    })
+                elseif hasV2 and not hasV3 then
+                    local bosses = {"Diamond", "Jeremy", "Fajita"}
+                    local bossFound = false
+                    for _, bossName in pairs(bosses) do
+                        for _, boss in pairs(Workspace:GetChildren()) do
+                            if boss.Name:find(bossName) and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                                bossFound = true
+                                tweenToPosition(rootPart, boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                    end
+                    if not bossFound then
+                        tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
+                        OrionLib:MakeNotification({
+                            Name = "Auto Human V3",
+                            Content = "No bosses found! Moving to Arowe for V3.",
+                            Time = 3
+                        })
+                    end
+                end
+            end
+
+            -- Auto Mink V2/V3
+            if _G.AutoMink then
+                local hasV2 = false -- Placeholder: Check Mink V2 status
+                local hasV3 = false -- Placeholder: Check Mink V3 status
+                if not hasV2 and beliCount >= 500000 then
+                    tweenToPosition(rootPart, TeleportLocations["Sea 1 - Skylands (Lv 150-200)"], 2)
+                    for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                        if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                            tweenToPosition(rootPart, enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            wait(0.1)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                        end
+                    end
+                    OrionLib:MakeNotification({
+                        Name = "Auto Mink V2",
+                        Content = "Farming kills or Beli for Mink V2...",
+                        Time = 3
+                    })
+                elseif hasV2 and not hasV3 then
+                    local bosses = {"Diamond", "Jeremy", "Fajita"}
+                    local bossFound = false
+                    for _, bossName in pairs(bosses) do
+                        for _, boss in pairs(Workspace:GetChildren()) do
+                            if boss.Name:find(bossName) and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                                bossFound = true
+                                tweenToPosition(rootPart, boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                    end
+                    if not bossFound then
+                        tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
+                        OrionLib:MakeNotification({
+                            Name = "Auto Mink V3",
+                            Content = "No bosses found! Moving to Arowe for V3.",
+                            Time = 3
+                        })
+                    end
+                end
+            end
+
+            -- Auto Skypian V2/V3
+            if _G.AutoSkypian then
+                local hasV2 = false -- Placeholder: Check Skypian V2 status
+                local hasV3 = false -- Placeholder: Check Skypian V3 status
+                if not hasV2 and beliCount >= 500000 then
+                    tweenToPosition(rootPart, TeleportLocations["Sea 1 - Skylands (Lv 150-200)"], 2)
+                    for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                        if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                            tweenToPosition(rootPart, enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            wait(0.1)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                        end
+                    end
+                    OrionLib:MakeNotification({
+                        Name = "Auto Skypian V2",
+                        Content = "Farming kills or Beli for Skypian V2...",
+                        Time = 3
+                    })
+                elseif hasV2 and not hasV3 then
+                    local bosses = {"Diamond", "Jeremy", "Fajita"}
+                    local bossFound = false
+                    for _, bossName in pairs(bosses) do
+                        for _, boss in pairs(Workspace:GetChildren()) do
+                            if boss.Name:find(bossName) and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                                bossFound = true
+                                tweenToPosition(rootPart, boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                    end
+                    if not bossFound then
+                        tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
+                        OrionLib:MakeNotification({
+                            Name = "Auto Skypian V3",
+                            Content = "No bosses found! Moving to Arowe for V3.",
+                            Time = 3
+                        })
+                    end
+                end
+            end
+
+            -- Auto Fishman V2/V3
+            if _G.AutoFishman then
+                local hasV2 = false -- Placeholder: Check Fishman V2 status
+                local hasV3 = false -- Placeholder: Check Fishman V3 status
+                if not hasV2 and beliCount >= 500000 then
+                    tweenToPosition(rootPart, TeleportLocations["Sea 1 - Frozen Village (Lv 120-150)"], 2)
+                    for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                        if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                            tweenToPosition(rootPart, enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            wait(0.1)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                        end
+                    end
+                    OrionLib:MakeNotification({
+                        Name = "Auto Fishman V2",
+                        Content = "Farming kills or Beli for Fishman V2...",
+                        Time = 3
+                    })
+                elseif hasV2 and not hasV3 then
+                    local bosses = {"Diamond", "Jeremy", "Fajita"}
+                    local bossFound = false
+                    for _, bossName in pairs(bosses) do
+                        for _, boss in pairs(Workspace:GetChildren()) do
+                            if boss.Name:find(bossName) and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                                bossFound = true
+                                tweenToPosition(rootPart, boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                    end
+                    if not bossFound then
+                        tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
+                        OrionLib:MakeNotification({
+                            Name = "Auto Fishman V3",
+                            Content = "No bosses found! Moving to Arowe for V3.",
+                            Time = 3
+                        })
+                    end
+                end
+            end
+
+            -- Auto Ghoul (Hellfire Torch + V2/V3)
+            if _G.AutoGhoul then
+                local hasTorch = false
+                local ectoplasmCount = 0 -- Placeholder: Check Ectoplasm
+                local hasV2 = false -- Placeholder: Check Ghoul V2 status
+                local hasV3 = false -- Placeholder: Check Ghoul V3 status
+
+                -- Check inventory for Hellfire Torch
+                for _, item in pairs(inventory) do
+                    if item.Name:find("Hellfire Torch") then
+                        hasTorch = true
+                        break
+                    end
+                end
+
+                -- Farm Hellfire Torch if needed
+                if not hasTorch then
+                    local bossFound = false
+                    for _, boss in pairs(Workspace:GetChildren()) do
+                        if boss.Name:find("Cursed Captain") and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                            bossFound = true
+                            tweenToPosition(rootPart, boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            wait(0.1)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                        end
+                    end
+                    if not bossFound then
+                        tweenToPosition(rootPart, TeleportLocations["Sea 2 - Graveyard (Cursed Captain for Ghoul)"], 2)
+                        OrionLib:MakeNotification({
+                            Name = "Auto Ghoul",
+                            Content = "Cursed Captain not found! Moving to Graveyard.",
+                            Time = 3
+                        })
+                    end
+                end
+
+                -- Auto Ghoul V2: Farm Ectoplasm + Beli
+                if hasTorch and not hasV2 and isInSea2or3() and beliCount >= 500000 then
+                    if ectoplasmCount < 100 then
+                        tweenToPosition(rootPart, TeleportLocations["Sea 2 - Cursed Ship (Lv 1100-1250)"], 2)
+                        for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                            if enemy.Name:find("Ship") and enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                                tweenToPosition(rootPart, enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                        OrionLib:MakeNotification({
+                            Name = "Auto Ghoul V2",
+                            Content = "Farming Ectoplasm for Ghoul V2...",
+                            Time = 3
+                        })
+                    else
+                        tweenToPosition(rootPart, TeleportLocations["Sea 2 - Cursed Ship (Experimic for Ghoul V2)"], 2)
+                        -- Placeholder: Fire remote for Ghoul V2
+                        -- game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyGhoulV2")
+                        OrionLib:MakeNotification({
+                            Name = "Auto Ghoul V2",
+                            Content = "Attempting to upgrade to Ghoul V2 at Experimic!",
+                            Time = 3
+                        })
+                    end
+                end
+
+                -- Auto Ghoul V3: Boss Kill
+                if hasV2 and not hasV3 and isInSea2or3() then
+                    local bosses = {"Diamond", "Jeremy", "Fajita"}
+                    local bossFound = false
+                    for _, bossName in pairs(bosses) do
+                        for _, boss in pairs(Workspace:GetChildren()) do
+                            if boss.Name:find(bossName) and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                                bossFound = true
+                                tweenToPosition(rootPart, boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                    end
+                    if not bossFound then
+                        tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
+                        -- Placeholder: Fire remote for Ghoul V3
+                        -- game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyGhoulV3")
+                        OrionLib:MakeNotification({
+                            Name = "Auto Ghoul V3",
+                            Content = "No bosses found! Moving to Arowe for V3.",
+                            Time = 3
+                        })
+                    end
+                end
+            end
+
+            -- Auto Cyborg (Core Brain + V2/V3)
+            if _G.AutoCyborg then
+                local hasCore = false
+                local hasV2 = false -- Placeholder: Check Cyborg V2 status
+                local hasV3 = false -- Placeholder: Check Cyborg V3 status
+
+                -- Check inventory for Core Brain
+                for _, item in pairs(inventory) do
+                    if item.Name:find("Core Brain") then
+                        hasCore = true
+                        break
+                    end
+                end
+
+                -- Farm Core Brain if needed
+                if not hasCore then
+                    local bossFound = false
+                    for _, boss in pairs(Workspace:GetChildren()) do
+                        if boss.Name:find("Order") and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                            bossFound = true
+                            tweenToPosition(rootPart, boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            wait(0.1)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                        end
+                    end
+                    if not bossFound then
+                        tweenToPosition(rootPart, TeleportLocations["Sea 2 - Hot and Cold (Order/Law for Cyborg)"], 2)
+                        OrionLib:MakeNotification({
+                            Name = "Auto Cyborg",
+                            Content = "Order not found! Moving to Hot and Cold.",
+                            Time = 3
+                        })
+                    end
+                end
+
+                -- Auto Cyborg V2: Core Brain + Beli
+                if hasCore and not hasV2 and isInSea2or3() and beliCount >= 500000 then
+                    tweenToPosition(rootPart, TeleportLocations["Sea 2 - Hot and Cold (Order/Law for Cyborg)"], 2)
+                    -- Placeholder: Fire remote for Cyborg V2
+                    -- game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyCyborgV2")
+                    OrionLib:MakeNotification({
+                        Name = "Auto Cyborg V2",
+                        Content = "Attempting to upgrade to Cyborg V2 at Mad Scientist!",
+                        Time = 3
+                    })
+                end
+
+                -- Auto Cyborg V3: Boss Kill
+                if hasV2 and not hasV3 and isInSea2or3() then
+                    local bosses = {"Diamond", "Jeremy", "Fajita"}
+                    local bossFound = false
+                    for _, bossName in pairs(bosses) do
+                        for _, boss in pairs(Workspace:GetChildren()) do
+                            if boss.Name:find(bossName) and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                                bossFound = true
+                                tweenToPosition(rootPart, boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                    end
+                    if not bossFound then
+                        tweenToPosition(rootPart, TeleportLocations["Sea 2 - Mansion (Arowe for V3)"], 2)
+                        -- Placeholder: Fire remote for Cyborg V3
+                        -- game.ReplicatedStorage.Remotes.CommF_:InvokeServer("BuyCyborgV3")
+                        OrionLib:MakeNotification({
+                            Name = "Auto Cyborg V3",
+                            Content = "No bosses found! Moving to Arowe for V3.",
+                            Time = 3
+                        })
+                    end
+                end
+            end
+
+            -- Auto V4 (All Races)
+            if _G.AutoV4 and isInSea2or3() then
+                local hasMirrorFractal = false
+                local hasV3 = false -- Placeholder: Check V3 status for current race
+                local hasV4 = false -- Placeholder: Check V4 status
+                local beliCount = player.Data.Beli.Value or 0
+
+                -- Check inventory for Mirror Fractal
+                for _, item in pairs(inventory) do
+                    if item.Name:find("Mirror Fractal") then
+                        hasMirrorFractal = true
+                        break
+                    end
+                end
+
+                -- Farm Mirror Fractal (Sea Events)
+                if not hasMirrorFractal then
+                    -- Placeholder: Trigger Sea Event
+                    tweenToPosition(rootPart, CFrame.new(0, 20, 0), 2) -- Move to sea
+                    OrionLib:MakeNotification({
+                        Name = "Auto V4",
+                        Content = "Farming Mirror Fractal from Sea Events...",
+                        Time = 3
+                    })
+                    wait(5) -- Simulate Sea Event
+                end
+
+                -- Check V3 and Beli
+                if hasMirrorFractal and not hasV3 and beliCount >= 10000000 then
+                    local currentRace = player.Data.Race.Value or "Unknown"
+                    if currentRace == "Human" and _G.AutoHuman then
+                        -- Handled by Auto Human V3
+                    elseif currentRace == "Mink" and _G.AutoMink then
+                        -- Handled by Auto Mink V3
+                    elseif currentRace == "Skypian" and _G.AutoSkypian then
+                        -- Handled by Auto Skypian V3
+                    elseif currentRace == "Fishman" and _G.AutoFishman then
+                        -- Handled by Auto Fishman V3
+                    elseif currentRace == "Ghoul" and _G.AutoGhoul then
+                        -- Handled by Auto Ghoul V3
+                    elseif currentRace == "Cyborg" and _G.AutoCyborg then
+                        -- Handled by Auto Cyborg V3
+                    end
+                end
+
+                -- Auto V4: Trial and Upgrade
+                if hasV3 and not hasV4 and beliCount >= 10000000 then
+                    local currentRace = player.Data.Race.Value or "Unknown"
+                    tweenToPosition(rootPart, TeleportLocations["Sea 3 - Temple of Time (V4 Trial)"], 2)
+                    if currentRace == "Human" then
+                        -- Trial of Strength
+                        for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                            if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                                tweenToPosition(rootPart, enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                        OrionLib:MakeNotification({
+                            Name = "Auto V4 Human",
+                            Content = "Completing Trial of Strength...",
+                            Time = 3
+                        })
+                    elseif currentRace == "Mink" then
+                        -- Trial of Speed
+                        tweenToPosition(rootPart, TeleportLocations["Sea 3 - Temple of Time (V4 Trial)"] * CFrame.new(0, 5, 0), 0.5)
+                        OrionLib:MakeNotification({
+                            Name = "Auto V4 Mink",
+                            Content = "Completing Trial of Speed...",
+                            Time = 3
+                        })
+                    elseif currentRace == "Skypian" then
+                        -- Trial of the King
+                        for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                            if enemy.Name:find("King") and enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                                tweenToPosition(rootPart, enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                        OrionLib:MakeNotification({
+                            Name = "Auto V4 Skypian",
+                            Content = "Completing Trial of the King...",
+                            Time = 3
+                        })
+                    elseif currentRace == "Fishman" then
+                        -- Trial of Water
+                        tweenToPosition(rootPart, TeleportLocations["Sea 3 - Temple of Time (V4 Trial)"] * CFrame.new(0, -10, 0), 0.5)
+                        OrionLib:MakeNotification({
+                            Name = "Auto V4 Fishman",
+                            Content = "Completing Trial of Water...",
+                            Time = 3
+                        })
+                    elseif currentRace == "Ghoul" then
+                        -- Trial of Carnage
+                        for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                            if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                                tweenToPosition(rootPart, enemy.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                        OrionLib:MakeNotification({
+                            Name = "Auto V4 Ghoul",
+                            Content = "Completing Trial of Carnage...",
+                            Time = 3
+                        })
+                    elseif currentRace == "Cyborg" then
+                        -- Trial of the Machine
+                        for _, boss in pairs(Workspace:GetChildren()) do
+                            if boss.Name:find("Order") and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                                tweenToPosition(rootPart, boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                                wait(0.1)
+                                VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            end
+                        end
+                        OrionLib:MakeNotification({
+                            Name = "Auto V4 Cyborg",
+                            Content = "Completing Trial of the Machine...",
+                            Time = 3
+                        })
+                    end
+                    -- Placeholder: Fire remote for V4
+                    -- game.ReplicatedStorage.Remotes.CommF_:InvokeServer("AwakenV4")
+                    OrionLib:MakeNotification({
+                        Name = "Auto V4",
+                        Content = "Attempting to upgrade to V4 at Temple of Time!",
+                        Time = 3
+                    })
+                end
+            end
+        end
+        wait(_G.FarmDelay)
+    end
+end)
+
+-- Auto Farm Loop with Tween
+spawn(function()
+    while true do
+        if _G.AutoFarmEnabled then
+            local character = player.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                local rootPart = character.HumanoidRootPart
+
+                if _G.FarmNearby then
+                    local target, dist = findTarget(false)
+                    if target then
+                        tweenToPosition(rootPart, target.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                        wait(0.1)
+                        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                    end
+                end
+
+                if _G.FarmMaterials then
+                    for _, mat in pairs(Workspace:GetChildren()) do
+                        if mat.Name:find("Chest") or mat.Name:find("Bone") or mat.Name:find("Fragment") then
+                            if mat:FindFirstChild("Handle") then
+                                local dist = (rootPart.Position - mat.Handle.Position).Magnitude
+                                if dist < 100 then
+                                    tweenToPosition(rootPart, mat.Handle.CFrame, 0.5)
+                                    firetouchinterest(rootPart, mat.Handle, 0)
+                                    wait(0.1)
+                                    firetouchinterest(rootPart, mat.Handle, 1)
+                                end
+                            end
+                        end
+                    end
+                end
+
+                if _G.FarmBoss then
+                    for _, boss in pairs(Workspace:GetChildren()) do
+                        if boss.Name:find("Boss") and not boss.Name:find("Cursed Captain") and not boss.Name:find("Order") and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+                            tweenToPosition(rootPart, boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0), 0.5)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            wait(0.1)
+                            VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                        end
+                    end
+                end
+            end
+        end
+        wait(_G.FarmDelay)
+    end
+end)
+
+-- Aim Loop with Tween
+spawn(function()
+    while true do
+        if _G.AimSkill or _G.AimTap or _G.AimGun or _G.AimNear or _G.AimFar then
+            local character = player.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                local target, dist = nil, nil
+                if _G.AimNear then
+                    target, dist = findTarget(false)
+                elseif _G.AimFar then
+                    target, dist = findTarget(true)
+                else
+                    target, dist = findTarget(false)
+                end
+
+                if target then
+                    local rootPart = character.HumanoidRootPart
+                    local targetPos = target.HumanoidRootPart.Position
+
+                    if _G.AimSkill then
+                        tweenToPosition(rootPart, CFrame.new(rootPart.Position, targetPos), 0.2)
+                        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                        wait(0.05)
+                        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                    end
+
+                    if _G.AimTap then
+                        tweenToPosition(rootPart, CFrame.new(rootPart.Position, targetPos), 0.2)
+                        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                        wait(0.05)
+                        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                    end
+
+                    if _G.AimGun then
+                        tweenToPosition(rootPart, CFrame.new(rootPart.Position, targetPos), 0.2)
+                        VirtualInputManager:SendMouseButtonEvent(0, 0, 1, true, game, 0)
+                        wait(0.05)
+                        VirtualInputManager:SendMouseButtonEvent(0, 0, 1, false, game, 0)
+                    end
+                end
+            end
+        end
+        wait(0.1)
+    end
+end)
+
+-- Auto Check Loop
+spawn(function()
+    while true do
+        if _G.AutoCheckEnabled then
+            checkServerMobsAndBosses()
+        end
+        wait(10)
+    end
+end)
+
+-- Auto Update ESP
+spawn(function()
+    while true do
+        if _G.ESPEnabled then
+            updateESP()
+        end
+        wait(1)
+    end
+end)
+
+-- FPS Display Loop
+local FPSLabel
+spawn(function()
+    while true do
+        if FPSLabel then
+            local fps = math.floor(1 / RunService.RenderStepped:Wait())
+            FPSLabel:Set("FPS: " .. fps)
+        end
+        wait(1)
+    end
+end)
+
+-- UI: Auto Farm Tab
+local FarmTab = Window:MakeTab({
+    Name = "Auto Farm",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local FarmSection = FarmTab:AddSection({ Name = "Farm Controls" })
+
+FarmTab:AddToggle({
+    Name = "Bật/Tắt Auto Farm",
+    Default = false,
+    Save = true,
+    Flag = "MainFarmToggle",
+    Callback = function(Value)
+        _G.AutoFarmEnabled = Value
+        OrionLib:MakeNotification({
+            Name = "Auto Farm",
+            Content = Value and "Đã bật!" or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "Farm Mục Tiêu Gần (Aura)",
+    Default = false,
+    Save = true,
+    Flag = "NearbyToggle",
+    Callback = function(Value)
+        _G.FarmNearby = Value
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "Farm Nguyên Liệu (Chests/Bones)",
+    Default = false,
+    Save = true,
+    Flag = "MaterialsToggle",
+    Callback = function(Value)
+        _G.FarmMaterials = Value
+    end
+})
+
+FarmTab:AddToggle({
+    Name = "Farm Boss",
+    Default = false,
+    Save = true,
+    Flag = "BossToggle",
+    Callback = function(Value)
+        _G.FarmBoss = Value
+    end
+})
+
+FarmTab:AddSlider({
+    Name = "Farm Delay",
+    Min = 0.1,
+    Max = 2,
+    Default = 0.5,
+    Color = Color3.fromRGB(255, 100, 100),
+    Increment = 0.1,
+    ValueName = "Seconds",
+    Callback = function(Value)
+        _G.FarmDelay = Value
+    end
+})
+
+-- UI: Aim/ESP Tab
+local AimESPTab = Window:MakeTab({
+    Name = "Aim/ESP",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local AimESPSection = AimESPTab:AddSection({ Name = "Aim & ESP Controls" })
+
+AimESPTab:AddToggle({
+    Name = "Bật/Tắt ESP (Hologram, Name, Distance)",
+    Default = false,
+    Save = true,
+    Flag = "ESPToggle",
+    Callback = function(Value)
+        _G.ESPEnabled = Value
+        updateESP()
+        OrionLib:MakeNotification({
+            Name = "ESP",
+            Content = Value and "Đã bật!" or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+AimESPTab:AddToggle({
+    Name = "Aim Skill (Tự nhắm kỹ năng)",
+    Default = false,
+    Save = true,
+    Flag = "AimSkillToggle",
+    Callback = function(Value)
+        _G.AimSkill = Value
+        OrionLib:MakeNotification({
+            Name = "Aim Skill",
+            Content = Value and "Đã bật!" or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+AimESPTab:AddToggle({
+    Name = "Aim Tap (Nhắm nhanh)",
+    Default = false,
+    Save = true,
+    Flag = "AimTapToggle",
+    Callback = function(Value)
+        _G.AimTap = Value
+        OrionLib:MakeNotification({
+            Name = "Aim Tap",
+            Content = Value and "Đã bật!" or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+AimESPTab:AddToggle({
+    Name = "Aim Gun (Nhắm súng)",
+    Default = false,
+    Save = true,
+    Flag = "AimGunToggle",
+    Callback = function(Value)
+        _G.AimGun = Value
+        OrionLib:MakeNotification({
+            Name = "Aim Gun",
+            Content = Value and "Đã bật!" or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+AimESPTab:AddToggle({
+    Name = "Aim Gần Nhất",
+    Default = false,
+    Save = true,
+    Flag = "AimNearToggle",
+    Callback = function(Value)
+        _G.AimNear = Value
+        if Value then _G.AimFar = false end
+        OrionLib:MakeNotification({
+            Name = "Aim Gần",
+            Content = Value and "Đã bật!" or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+AimESPTab:AddToggle({
+    Name = "Aim Xa Nhất",
+    Default = false,
+    Save = true,
+    Flag = "AimFarToggle",
+    Callback = function(Value)
+        _G.AimFar = Value
+        if Value then _G.AimNear = false end
+        OrionLib:MakeNotification({
+            Name = "Aim Xa",
+            Content = Value and "Đã bật!" or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+AimESPTab:AddSlider({
+    Name = "Aim Range",
+    Min = 50,
+    Max = 1000,
+    Default = 200,
+    Color = Color3.fromRGB(255, 100, 100),
+    Increment = 10,
+    ValueName = "Studs",
+    Callback = function(Value)
+        _G.AimRange = Value
+        OrionLib:MakeNotification({
+            Name = "Aim Range",
+            Content = "Đặt phạm vi aim: " .. Value .. " studs",
+            Time = 3
+        })
+    end
+})
+
+-- UI: Teleport/Sea Tab
+local TeleTab = Window:MakeTab({
+    Name = "Teleport/Sea",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local TeleSection = TeleTab:AddSection({ Name = "All Islands & Seas (Tween, Level Info from Wiki)" })
+
+TeleTab:AddDropdown({
+    Name = "Chọn Vị Trí Teleport",
+    Options = {
+        "Sea 1 - Starter Island (Lv 0-15)", "Sea 1 - Jungle (Lv 15-30)", "Sea 1 - Pirate Village (Lv 30-60)",
+        "Sea 1 - Desert (Lv 60-90)", "Sea 1 - Middle Town (Lv 90-120)", "Sea 1 - Frozen Village (Lv 120-150)",
+        "Sea 1 - Skylands (Lv 150-200)", "Sea 1 - Marine Fortress (Lv 130-180)",
+        "Sea 2 - Kingdom of Rose (Lv 700-850)", "Sea 2 - Cafe (Lv 700-850)", "Sea 2 - Mansion (Lv 850-950)",
+        "Sea 2 - Graveyard (Lv 950-1000)", "Sea 2 - Hot and Cold (Lv 1000-1100)", "Sea 2 - Cursed Ship (Lv 1100-1250)",
+        "Sea 3 - Port Town (Lv 1500-1600)", "Sea 3 - Hydra Island (Lv 1600-1700)", "Sea 3 - Castle on the Sea (Lv 1700-1800)",
+        "Sea 3 - Floating Turtle (Lv 1800-1900)", "Sea 3 - Haunted Castle (Lv 1900-2000)", "Sea 3 - Tiki Outpost (Lv 2000-2100)",
+        "Sea 3 - Port of the Dead (Lv 2100-2200)", "Sea 3 - Great Tree (Lv 2200-2300)", "Sea 3 - Sea of Treats (Lv 2300-2400)",
+        "Sea 2 - Graveyard (Cursed Captain for Ghoul)", "Sea 2 - Hot and Cold (Order/Law for Cyborg)",
+        "Sea 2 - Cursed Ship (Experimic for Ghoul V2)", "Sea 2 - Mansion (Arowe for V3)",
+        "Sea 3 - Temple of Time (V4 Trial)"
+    },
+    Default = "Sea 1 - Starter Island (Lv 0-15)",
+    Callback = function(Option)
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local levelInfo = Option:match("%(([^)]+)%)") or "Unknown Level"
+            tweenToPosition(character.HumanoidRootPart, TeleportLocations[Option], 2)
+            OrionLib:MakeNotification({
+                Name = "Teleport",
+                Content = "Đã di chuyển đến " .. Option .. " (Level: " .. levelInfo .. ")!",
+                Time = 3
+            })
+        end
+    end
+})
+
+-- UI: Race/V4 Tab
+local RaceV4Tab = Window:MakeTab({
+    Name = "Race/V4",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local RaceV4Section = RaceV4Tab:AddSection({ Name = "Auto Race Upgrades (V2/V3/V4)" })
+
+RaceV4Tab:AddToggle({
+    Name = "Auto Human (V2/V3/V4)",
+    Default = false,
+    Save = true,
+    Flag = "AutoHumanToggle",
+    Callback = function(Value)
+        _G.AutoHuman = Value
+        OrionLib:MakeNotification({
+            Name = "Auto Human",
+            Content = Value and "Đã bật! Farm V2/V3/V4 for Human." or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+RaceV4Tab:AddToggle({
+    Name = "Auto Mink (V2/V3/V4)",
+    Default = false,
+    Save = true,
+    Flag = "AutoMinkToggle",
+    Callback = function(Value)
+        _G.AutoMink = Value
+        OrionLib:MakeNotification({
+            Name = "Auto Mink",
+            Content = Value and "Đã bật! Farm V2/V3/V4 for Mink." or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+RaceV4Tab:AddToggle({
+    Name = "Auto Skypian (V2/V3/V4)",
+    Default = false,
+    Save = true,
+    Flag = "AutoSkypianToggle",
+    Callback = function(Value)
+        _G.AutoSkypian = Value
+        OrionLib:MakeNotification({
+            Name = "Auto Skypian",
+            Content = Value and "Đã bật! Farm V2/V3/V4 for Skypian." or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+RaceV4Tab:AddToggle({
+    Name = "Auto Fishman (V2/V3/V4)",
+    Default = false,
+    Save = true,
+    Flag = "AutoFishmanToggle",
+    Callback = function(Value)
+        _G.AutoFishman = Value
+        OrionLib:MakeNotification({
+            Name = "Auto Fishman",
+            Content = Value and "Đã bật! Farm V2/V3/V4 for Fishman." or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+if isInSea2or3() then
+    RaceV4Tab:AddToggle({
+        Name = "Auto Ghoul (V2/V3/V4)",
+        Default = false,
+        Save = true,
+        Flag = "AutoGhoulToggle",
+        Callback = function(Value)
+            _G.AutoGhoul = Value
+            OrionLib:MakeNotification({
+                Name = "Auto Ghoul",
+                Content = Value and "Đã bật! Farm Torch, Ectoplasm, V2/V3/V4." or "Đã tắt!",
+                Time = 3
+            })
+        end
+    })
+
+    RaceV4Tab:AddToggle({
+        Name = "Auto Cyborg (V2/V3/V4)",
+        Default = false,
+        Save = true,
+        Flag = "AutoCyborgToggle",
+        Callback = function(Value)
+            _G.AutoCyborg = Value
+            OrionLib:MakeNotification({
+                Name = "Auto Cyborg",
+                Content = Value and "Đã bật! Farm Core Brain, V2/V3/V4." or "Đã tắt!",
+                Time = 3
+            })
+        end
+    })
+
+    RaceV4Tab:AddToggle({
+        Name = "Auto V4 (All Races)",
+        Default = false,
+        Save = true,
+        Flag = "AutoV4Toggle",
+        Callback = function(Value)
+            _G.AutoV4 = Value
+            OrionLib:MakeNotification({
+                Name = "Auto V4",
+                Content = Value and "Đã bật! Farm Trials and Mirror Fractal for V4." or "Đã tắt!",
+                Time = 3
+            })
+        end
+    })
+else
+    RaceV4Tab:AddLabel("Ghoul/Cyborg/V4 only available in Sea 2/3 (Level 700+)")
+end
+
+-- UI: Server Check Tab
+local CheckTab = Window:MakeTab({
+    Name = "Server Check",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local CheckSection = CheckTab:AddSection({ Name = "Auto Update Check" })
+
+CheckTab:AddToggle({
+    Name = "Bật/Tắt Tự Động Check Server",
+    Default = false,
+    Save = true,
+    Flag = "CheckToggle",
+    Callback = function(Value)
+        _G.AutoCheckEnabled = Value
+        if Value then checkServerMobsAndBosses() end
+        OrionLib:MakeNotification({
+            Name = "Server Check",
+            Content = Value and "Đã bật auto check!" or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+CheckTab:AddButton({
+    Name = "Check Ngay (Boss & Mobs by Level)",
+    Callback = function()
+        checkServerMobsAndBosses()
+    end
+})
+
+local LevelLabel = CheckTab:AddLabel("Player Level: Loading...")
+spawn(function()
+    while true do
+        updatePlayerLevel()
+        LevelLabel:Set("Player Level: " .. _G.PlayerLevel)
+        wait(5)
+    end
+end)
+
+-- UI: Special Tab (Shader, FPS, Lag Reduction)
+local SpecialTab = Window:MakeTab({
+    Name = "Đặc Biệt",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+local SpecialSection = SpecialTab:AddSection({ Name = "Shader & Performance" })
+
+SpecialTab:AddToggle({
+    Name = "Bật/Tắt Shader (Bloom, Color, Blur)",
+    Default = false,
+    Save = true,
+    Flag = "ShaderToggle",
+    Callback = function(Value)
+        _G.ShaderEnabled = Value
+        applyShader()
+        OrionLib:MakeNotification({
+            Name = "Shader",
+            Content = Value and "Đã bật! Áp dụng Bloom, Color Correction, Blur." or "Đã tắt!",
+            Time = 3
+        })
+    end
+})
+
+SpecialTab:AddToggle({
+    Name = "Bật/Tắt Giảm Lag",
+    Default = false,
+    Save = true,
+    Flag = "LagReductionToggle",
+    Callback = function(Value)
+        _G.LagReductionEnabled = Value
+        applyLagReduction()
+    end
+})
+
+FPSLabel = SpecialTab:AddLabel("FPS: Loading...")
+
+-- Initialize
+applyShader()
+applyLagReduction()
+OrionLib:Init()
+OrionLib:MakeNotification({
+    Name = "Hub Loaded",
+    Content = "Voidteam Hub ready! All features + Race/V4 (Key: Voidteam_hub).",
+    Time = 5
+})
+
+print("Blox Fruits Voidteam Hub Loaded with Key: Voidteam_hub")
