@@ -1,5 +1,5 @@
--- VOID_HUB - ULTIMATE EXPLOIT HUB 2025
--- GLITCH INTRO + AUTOWIN + FIX LAG (NÚT RIÊNG)
+-- VOID_HUB - TRUNG TÂM KHAI THÁC TỐI THƯỢNG 2025 --
+-- GIỚI THIỆU GLITCH + TỰ THẮNG OBBY + SỬA LAG (NÚT RIÊNG)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -24,14 +24,14 @@ local FOV_NPC = 150
 local FOV_CIRCLE_PLAYER = nil
 local FOV_CIRCLE_NPC = nil
 
--- === ESP TRẠNG THÁI ===
+-- === TRẠNG THÁI ESP ===
 local ESP_HOLOGRAM = false
 local ESP_HIGHLIGHTS = false
 local ESP_NAME = false
 local ESP_DISTANCE = false
 local ESP_BOX = false
 
--- === AUTOWIN & FIXLAG TRẠNG THÁI ===
+-- === TRẠNG THÁI AUTOWIN & FIXLAG ===
 local AUTOWIN_ENABLED = false
 local FIXLAG_ENABLED = false
 
@@ -45,7 +45,7 @@ ScreenGui.Name = "VOID_HUB_GUI"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
--- ================== HIỆU ỨNG GLITCH + MATRIX INTRO ==================
+-- ================== HIỆU ỨNG GLITCH + GIỚI THIỆU MATRIX ==================
 local IntroGui = Instance.new("ScreenGui")
 IntroGui.Name = "VOID_INTRO"
 IntroGui.Parent = game:GetService("CoreGui")
@@ -55,7 +55,7 @@ GlitchFrame.Size = UDim2.new(1, 0, 1, 0)
 GlitchFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 GlitchFrame.Parent = IntroGui
 
--- Glitch Overlay
+-- Lớp hiệu ứng Glitch
 local glitchOverlay = Instance.new("ImageLabel")
 glitchOverlay.Size = UDim2.new(1, 0, 1, 0)
 glitchOverlay.BackgroundTransparency = 1
@@ -63,7 +63,7 @@ glitchOverlay.Image = "rbxassetid://215384789"
 glitchOverlay.ImageTransparency = 0.7
 glitchOverlay.Parent = GlitchFrame
 
--- Glitch Lines
+-- Các dòng glitch
 local lines = {}
 for i = 1, 20 do
     local line = Instance.new("Frame")
@@ -75,7 +75,7 @@ for i = 1, 20 do
     table.insert(lines, line)
 end
 
--- VOID_HUB Text
+-- Dòng chữ VOID_HUB
 local voidText = Instance.new("TextLabel")
 voidText.Size = UDim2.new(0, 700, 0, 120)
 voidText.Position = UDim2.new(0.5, -350, 0.5, -60)
@@ -88,7 +88,7 @@ voidText.TextStrokeTransparency = 0.5
 voidText.TextStrokeColor3 = Color3.fromRGB(0, 100, 0)
 voidText.Parent = GlitchFrame
 
--- Glitch Animation
+-- Hiệu ứng Glitch Text
 spawn(function()
     local original = "VOID_HUB"
     local glitchText = voidText
@@ -99,16 +99,16 @@ spawn(function()
             if math.random() < 0.7 then
                 scrambled = scrambled .. string.char(math.random(33, 126))
             else
-                scrambled = scrambled .. original:sub(j,j)
+                scrambled = scrambled .. original:sub(j, j)
             end
         end
         glitchText.Text = scrambled
         wait(0.05)
     end
     glitchText.Text = original
-end
+end)
 
--- Matrix Rain
+-- Mưa Matrix
 local columns = {}
 for i = 1, math.floor(Camera.ViewportSize.X / 18) do
     local col = {x = i * 18, y = math.random(-500, 0), speed = math.random(3, 8), length = math.random(6, 18), chars = {}}
@@ -126,7 +126,7 @@ for i = 1, math.floor(Camera.ViewportSize.X / 18) do
     table.insert(columns, col)
 end
 
--- Update Animation
+-- Cập nhật hoạt ảnh
 spawn(function()
     local start = tick()
     while tick() - start < 5 do
@@ -150,16 +150,16 @@ spawn(function()
     IntroGui:Destroy()
 end)
 
-print("VOID_HUB INTRO ĐÃ HOÀN TẤT!")
+print("✨ VOID_HUB GIỚI THIỆU ĐÃ HOÀN TẤT!")
 
--- ================== GUI CHÍNH ==================
+-- ================== GIAO DIỆN CHÍNH ==================
 local ControlBtn = Instance.new("TextButton")
 ControlBtn.Size = UDim2.new(0, 140, 0, 50)
 ControlBtn.Position = UDim2.new(0, 10, 0, 10)
 ControlBtn.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
 ControlBtn.BorderSizePixel = 2
 ControlBtn.BorderColor3 = Color3.fromRGB(100, 0, 255)
-ControlBtn.Text = "VOID_HUB"
+ControlBtn.Text = "MỞ VOID_HUB"
 ControlBtn.TextColor3 = Color3.fromRGB(200, 0, 255)
 ControlBtn.Font = Enum.Font.GothamBlack
 ControlBtn.TextSize = 20
@@ -176,7 +176,7 @@ gradient.Color = ColorSequence.new{
 gradient.Rotation = 45
 gradient.Parent = ControlBtn
 
--- Main Frame
+-- Khung chính
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 380, 0, 860)
 MainFrame.Position = UDim2.new(0, 160, 0, 10)
@@ -191,11 +191,11 @@ MainFrame.Parent = ScreenGui
 local mfCorner = Instance.new("UICorner", MainFrame)
 mfCorner.CornerRadius = UDim.new(0, 16)
 
--- Title
+-- Tiêu đề
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 50)
 Title.BackgroundColor3 = Color3.fromRGB(20, 0, 60)
-Title.Text = "VOID_HUB"
+Title.Text = "⚡ TRUNG TÂM VOID_HUB ⚡"
 Title.TextColor3 = Color3.fromRGB(200, 100, 255)
 Title.Font = Enum.Font.GothamBlack
 Title.TextSize = 22
@@ -220,12 +220,12 @@ local function createButton(text, posY, callback)
     return btn
 end
 
--- === NÚT AUTOWIN ===
-local autowinBtn = createButton("AUTOWIN OBBY: OFF", 60, function()
+-- === NÚT TỰ ĐỘNG THẮNG OBBY ===
+local autowinBtn = createButton("TỰ ĐỘNG THẮNG OBBY: TẮT", 60, function()
     AUTOWIN_ENABLED = not AUTOWIN_ENABLED
-    autowinBtn.Text = "AUTOWIN OBBY: " .. (AUTOWIN_ENABLED and "ON" or "OFF")
+    autowinBtn.Text = "TỰ ĐỘNG THẮNG OBBY: " .. (AUTOWIN_ENABLED and "BẬT" or "TẮT")
     autowinBtn.BackgroundColor3 = AUTOWIN_ENABLED and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(30, 30, 50)
-    
+
     if AUTOWIN_ENABLED then
         pcall(function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/SCRIPTS2012/SCRIPT-BLOXF/refs/heads/main/AUTOWIN%20ALL%20OBBY%20MAP"))()
@@ -233,12 +233,12 @@ local autowinBtn = createButton("AUTOWIN OBBY: OFF", 60, function()
     end
 end)
 
--- === NÚT FIX LAG ===
-local fixlagBtn = createButton("FIX LAG VIP: OFF", 110, function()
+-- === NÚT SỬA LAG ===
+local fixlagBtn = createButton("SỬA LAG VIP: TẮT", 110, function()
     FIXLAG_ENABLED = not FIXLAG_ENABLED
-    fixlagBtn.Text = "FIX LAG VIP: " .. (FIXLAG_ENABLED and "ON" or "OFF")
+    fixlagBtn.Text = "SỬA LAG VIP: " .. (FIXLAG_ENABLED and "BẬT" or "TẮT")
     fixlagBtn.BackgroundColor3 = FIXLAG_ENABLED and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(30, 30, 50)
-    
+
     if FIXLAG_ENABLED then
         pcall(function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/SCRIPTS2012/SCRIPT-BLOXF/refs/heads/main/Fixlagvip%20by%20Void_team"))()
@@ -246,13 +246,10 @@ local fixlagBtn = createButton("FIX LAG VIP: OFF", 110, function()
     end
 end)
 
--- === CÁC NÚT KHÁC (giữ nguyên) ===
--- God Mode, Fly, ESP, Aimbot, Teleport... đặt sau (vị trí từ 160 trở đi)
-
--- === NÚT ON/OFF CHÍNH ===
+-- === NÚT MỞ / ĐÓNG CHÍNH ===
 ControlBtn.MouseButton1Click:Connect(function()
     GUI_OPEN = not GUI_OPEN
     MainFrame.Visible = GUI_OPEN
 end)
 
-print("VOID_HUB SẴN SÀNG! Bấm nút VOID_HUB để mở GUI.")
+print("✅ VOID_HUB ĐÃ SẴN SÀNG! Bấm 'MỞ VOID_HUB' để bật giao diện.")
