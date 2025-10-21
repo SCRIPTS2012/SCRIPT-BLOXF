@@ -1,1 +1,355 @@
--- VOID_HUB - ULTIMATE EXPLOIT HUB 2025 -- GLITCH INTRO + AUTOWIN + FIX LAG (NÚT RIÊNG)  local Players = game:GetService("Players") local UserInputService = game:GetService("UserInputService") local RunService = game:GetService("RunService") local Workspace = game:GetService("Workspace") local LocalPlayer = Players.LocalPlayer local Camera = Workspace.CurrentCamera  -- === TRẠNG THÁI === local GUI_OPEN = false local INF_JUMP = false local FLYING = false local NOCLIP = false local AIRWALK = false local GOD_MODE = false local TPWALK_GUI = nil local FLY_GUI = nil local AIMBOT_PLAYER = false local AIMBOT_NPC = false local FOV_PLAYER = 100 local FOV_NPC = 150 local FOV_CIRCLE_PLAYER = nil local FOV_CIRCLE_NPC = nil  -- === ESP TRẠNG THÁI === local ESP_HOLOGRAM = false local ESP_HIGHLIGHTS = false local ESP_NAME = false local ESP_DISTANCE = false local ESP_BOX = false  -- === AUTOWIN & FIXLAG TRẠNG THÁI === local AUTOWIN_ENABLED = false local FIXLAG_ENABLED = false  local ESP_FOLDER = Instance.new("Folder") ESP_FOLDER.Name = "VOID_ESP" ESP_FOLDER.Parent = Workspace  -- Tạo GUI chính local ScreenGui = Instance.new("ScreenGui") ScreenGui.Name = "VOID_HUB_GUI" ScreenGui.Parent = game:GetService("CoreGui") ScreenGui.ResetOnSpawn = false  -- ================== HIỆU ỨNG GLITCH + MATRIX INTRO ================== local IntroGui = Instance.new("ScreenGui") IntroGui.Name = "VOID_INTRO" IntroGui.Parent = game:GetService("CoreGui")  local GlitchFrame = Instance.new("Frame") GlitchFrame.Size = UDim2.new(1, 0, 1, 0) GlitchFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) GlitchFrame.Parent = IntroGui  -- Glitch Overlay local glitchOverlay = Instance.new("ImageLabel") glitchOverlay.Size = UDim2.new(1, 0, 1, 0) glitchOverlay.BackgroundTransparency = 1 glitchOverlay.Image = "rbxassetid://215384789" glitchOverlay.ImageTransparency = 0.7 glitchOverlay.Parent = GlitchFrame  -- Glitch Lines local lines = {} for i = 1, 20 do     local line = Instance.new("Frame")     line.Size = UDim2.new(1, 0, 0, 2)     line.Position = UDim2.new(0, 0, 0, math.random(0, 1000))     line.BackgroundColor3 = Color3.fromRGB(0, 255, 0)     line.BorderSizePixel = 0     line.Parent = GlitchFrame     table.insert(lines, line) end  -- VOID_HUB Text local voidText = Instance.new("TextLabel") voidText.Size = UDim2.new(0, 700, 0, 120) voidText.Position = UDim2.new(0.5, -350, 0.5, -60) voidText.BackgroundTransparency = 1 voidText.Text = "VOID_HUB" voidText.TextColor3 = Color3.fromRGB(0, 255, 0) voidText.Font = Enum.Font.Code voidText.TextSize = 60 voidText.TextStrokeTransparency = 0.5 voidText.TextStrokeColor3 = Color3.fromRGB(0, 100, 0) voidText.Parent = GlitchFrame  -- Glitch Animation spawn(function()     local original = "VOID_HUB"     local glitchText = voidText      for i = 1, 30 do         local scrambled = ""         for j = 1, #original do             if math.random() < 0.7 then                 scrambled = scrambled .. string.char(math.random(33, 126))             else                 scrambled = scrambled .. original:sub(j,j)             end         end         glitchText.Text = scrambled         wait(0.05)     end     glitchText.Text = original end  -- Matrix Rain local columns = {} for i = 1, math.floor(Camera.ViewportSize.X / 18) do     local col = {x = i * 18, y = math.random(-500, 0), speed = math.random(3, 8), length = math.random(6, 18), chars = {}}     for j = 1, col.length do         local char = Instance.new("TextLabel")         char.Size = UDim2.new(0, 16, 0, 20)         char.BackgroundTransparency = 1         char.Text = string.char(math.random(33, 126))         char.TextColor3 = Color3.fromRGB(0, 255, 0)         char.Font = Enum.Font.Code         char.TextSize = 14         char.Parent = GlitchFrame         table.insert(col.chars, char)     end     table.insert(columns, col) end  -- Update Animation spawn(function()     local start = tick()     while tick() - start < 5 do         for _, col in pairs(columns) do             col.y = col.y + col.speed             if col.y > Camera.ViewportSize.Y + 100 then col.y = -100 end             for i, char in pairs(col.chars) do                 local offset = (i - 1) * 20                 char.Position = UDim2.new(0, col.x, 0, col.y - offset)                 char.TextTransparency = i == 1 and 0 or (i / col.length * 0.8)                 if math.random() < 0.1 then char.Text = string.char(math.random(33, 126)) end             end         end         for _, line in pairs(lines) do             line.Position = UDim2.new(0, 0, 0, math.random(0, Camera.ViewportSize.Y))             line.Visible = math.random() < 0.3         end         glitchOverlay.ImageTransparency = 0.6 + math.random() * 0.2         RunService.Heartbeat:Wait()     end     IntroGui:Destroy() end)  print("VOID_HUB INTRO ĐÃ HOÀN TẤT!")  -- ================== GUI CHÍNH ================== local ControlBtn = Instance.new("TextButton") ControlBtn.Size = UDim2.new(0, 140, 0, 50) ControlBtn.Position = UDim2.new(0, 10, 0, 10) ControlBtn.BackgroundColor3 = Color3.fromRGB(10, 10, 20) ControlBtn.BorderSizePixel = 2 ControlBtn.BorderColor3 = Color3.fromRGB(100, 0, 255) ControlBtn.Text = "VOID_HUB" ControlBtn.TextColor3 = Color3.fromRGB(200, 0, 255) ControlBtn.Font = Enum.Font.GothamBlack ControlBtn.TextSize = 20 ControlBtn.Parent = ScreenGui  local corner = Instance.new("UICorner", ControlBtn) corner.CornerRadius = UDim.new(0, 14)  local gradient = Instance.new("UIGradient") gradient.Color = ColorSequence.new{     ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 0, 100)),     ColorSequenceKeypoint.new(1, Color3.fromRGB(150, 0, 255)) } gradient.Rotation = 45 gradient.Parent = ControlBtn  -- Main Frame local MainFrame = Instance.new("Frame") MainFrame.Size = UDim2.new(0, 380, 0, 860) MainFrame.Position = UDim2.new(0, 160, 0, 10) MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25) MainFrame.BorderSizePixel = 2 MainFrame.BorderColor3 = Color3.fromRGB(120, 0, 255) MainFrame.Visible = false MainFrame.Active = true MainFrame.Draggable = true MainFrame.Parent = ScreenGui  local mfCorner = Instance.new("UICorner", MainFrame) mfCorner.CornerRadius = UDim.new(0, 16)  -- Title local Title = Instance.new("TextLabel") Title.Size = UDim2.new(1, 0, 0, 50) Title.BackgroundColor3 = Color3.fromRGB(20, 0, 60) Title.Text = "VOID_HUB" Title.TextColor3 = Color3.fromRGB(200, 100, 255) Title.Font = Enum.Font.GothamBlack Title.TextSize = 22 Title.Parent = MainFrame  -- Hàm tạo nút local function createButton(text, posY, callback)     local btn = Instance.new("TextButton")     btn.Size = UDim2.new(0, 340, 0, 42)     btn.Position = UDim2.new(0, 20, 0, posY)     btn.BackgroundColor3 = Color3.fromRGB(30, 30, 50)     btn.BorderSizePixel = 1     btn.BorderColor3 = Color3.fromRGB(100, 0, 200)     btn.Text = text     btn.TextColor3 = Color3.fromRGB(200, 150, 255)     btn.Font = Enum.Font.GothamBold     btn.TextSize = 15     btn.Parent = MainFrame     local c = Instance.new("UICorner", btn)     c.CornerRadius = UDim.new(0, 10)     btn.MouseButton1Click:Connect(callback)     return btn end  -- === NÚT AUTOWIN === local autowinBtn = createButton("AUTOWIN OBBY: OFF", 60, function()     AUTOWIN_ENABLED = not AUTOWIN_ENABLED     autowinBtn.Text = "AUTOWIN OBBY: " .. (AUTOWIN_ENABLED and "ON" or "OFF")     autowinBtn.BackgroundColor3 = AUTOWIN_ENABLED and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(30, 30, 50)          if AUTOWIN_ENABLED then         pcall(function()             loadstring(game:HttpGet("https://raw.githubusercontent.com/SCRIPTS2012/SCRIPT-BLOXF/refs/heads/main/AUTOWIN%20ALL%20OBBY%20MAP"))()         end)     end end)  -- === NÚT FIX LAG === local fixlagBtn = createButton("FIX LAG VIP: OFF", 110, function()     FIXLAG_ENABLED = not FIXLAG_ENABLED     fixlagBtn.Text = "FIX LAG VIP: " .. (FIXLAG_ENABLED and "ON" or "OFF")     fixlagBtn.BackgroundColor3 = FIXLAG_ENABLED and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(30, 30, 50)          if FIXLAG_ENABLED then         pcall(function()             loadstring(game:HttpGet("https://raw.githubusercontent.com/SCRIPTS2012/SCRIPT-BLOXF/refs/heads/main/Fixlagvip%20by%20Void_team"))()         end)     end end)  -- === CÁC NÚT KHÁC (giữ nguyên) === -- God Mode, Fly, ESP, Aimbot, Teleport... đặt sau (vị trí từ 160 trở đi)  -- === NÚT ON/OFF CHÍNH === ControlBtn.MouseButton1Click:Connect(function()     GUI_OPEN = not GUI_OPEN     MainFrame.Visible = GUI_OPEN end)  print("VOID_HUB SẴN SÀNG! Bấm nút VOID_HUB để mở GUI.")
+-- VOID_HUB - OUTSIDE GAME SUPPORT (MENU / HUB / LOBBY)
+-- GLITCH INTRO + AUTOWIN + FIX LAG + FULL FEATURES
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+
+-- === TRẠNG THÁI ===
+local GUI_OPEN = false
+local INF_JUMP = false
+local FLYING = false
+local NOCLIP = false
+local AIRWALK = false
+local GOD_MODE = false
+local TPWALK_GUI = nil
+local FLY_GUI = nil
+local AIMBOT_PLAYER = false
+local AIMBOT_NPC = false
+local FOV_PLAYER = 100
+local FOV_NPC = 150
+local FOV_CIRCLE_PLAYER = nil
+local FOV_CIRCLE_NPC = nil
+
+-- === ESP TRẠNG THÁI ===
+local ESP_HOLOGRAM = false
+local ESP_HIGHLIGHTS = false
+local ESP_NAME = false
+local ESP_DISTANCE = false
+local ESP_BOX = false
+
+-- === AUTOWIN & FIXLAG ===
+local AUTOWIN_ENABLED = false
+local FIXLAG_ENABLED = false
+
+local ESP_FOLDER = Instance.new("Folder")
+ESP_FOLDER.Name = "VOID_ESP"
+ESP_FOLDER.Parent = Workspace
+
+-- Tạo GUI chính
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "VOID_HUB_GUI"
+ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.ResetOnSpawn = false  -- QUAN TRỌNG: HOẠT ĐỘNG Ở NGOÀI GAME
+
+-- ================== HIỆU ỨNG GLITCH + MATRIX INTRO ==================
+local IntroGui = Instance.new("ScreenGui")
+IntroGui.Name = "VOID_INTRO"
+IntroGui.Parent = game:GetService("CoreGui")
+IntroGui.ResetOnSpawn = false
+
+local GlitchFrame = Instance.new("Frame")
+GlitchFrame.Size = UDim2.new(1, 0, 1, 0)
+GlitchFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+GlitchFrame.Parent = IntroGui
+
+-- Glitch Overlay
+local glitchOverlay = Instance.new("ImageLabel")
+glitchOverlay.Size = UDim2.new(1, 0, 1, 0)
+glitchOverlay.BackgroundTransparency = 1
+glitchOverlay.Image = "rbxassetid://215384789"
+glitchOverlay.ImageTransparency = 0.7
+glitchOverlay.Parent = GlitchFrame
+
+-- Glitch Lines
+local lines = {}
+for i = 1, 20 do
+    local line = Instance.new("Frame")
+    line.Size = UDim2.new(1, 0, 0, 2)
+    line.Position = UDim2.new(0, 0, 0, math.random(0, 1000))
+    line.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    line.BorderSizePixel = 0
+    line.Parent = GlitchFrame
+    table.insert(lines, line)
+end
+
+-- VOID_HUB Text
+local voidText = Instance.new("TextLabel")
+voidText.Size = UDim2.new(0, 700, 0, 120)
+voidText.Position = UDim2.new(0.5, -350, 0.5, -60)
+voidText.BackgroundTransparency = 1
+voidText.Text = "VOID_HUB"
+voidText.TextColor3 = Color3.fromRGB(0, 255, 0)
+voidText.Font = Enum.Font.Code
+voidText.TextSize = 60
+voidText.TextStrokeTransparency = 0.5
+voidText.TextStrokeColor3 = Color3.fromRGB(0, 100, 0)
+voidText.Parent = GlitchFrame
+
+-- Glitch Animation
+spawn(function()
+    local original = "VOID_HUB"
+    for i = 1, 30 do
+        local scrambled = ""
+        for j = 1, #original do
+            if math.random() < 0.7 then
+                scrambled = scrambled .. string.char(math.random(33, 126))
+            else
+                scrambled = scrambled .. original:sub(j,j)
+            end
+        end
+        voidText.Text = scrambled
+        wait(0.05)
+    end
+    voidText.Text = original
+end
+
+-- Matrix Rain
+local columns = {}
+for i = 1, math.floor((Camera.ViewportSize.X or 1920) / 18) do
+    local col = {x = i * 18, y = math.random(-500, 0), speed = math.random(3, 8), length = math.random(6, 18), chars = {}}
+    for j = 1, col.length do
+        local char = Instance.new("TextLabel")
+        char.Size = UDim2.new(0, 16, 0, 20)
+        char.BackgroundTransparency = 1
+        char.Text = string.char(math.random(33, 126))
+        char.TextColor3 = Color3.fromRGB(0, 255, 0)
+        char.Font = Enum.Font.Code
+        char.TextSize = 14
+        char.Parent = GlitchFrame
+        table.insert(col.chars, char)
+    end
+    table.insert(columns, col)
+end
+
+-- Update Animation
+spawn(function()
+    local start = tick()
+    while tick() - start < 5 do
+        for _, col in pairs(columns) do
+            col.y = col.y + col.speed
+            if col.y > (Camera.ViewportSize.Y or 1080) + 100 then col.y = -100 end
+            for i, char in pairs(col.chars) do
+                local offset = (i - 1) * 20
+                char.Position = UDim2.new(0, col.x, 0, col.y - offset)
+                char.TextTransparency = i == 1 and 0 or (i / col.length * 0.8)
+                if math.random() < 0.1 then char.Text = string.char(math.random(33, 126)) end
+            end
+        end
+        for _, line in pairs(lines) do
+            line.Position = UDim2.new(0, 0, 0, math.random(0, (Camera.ViewportSize.Y or 1080)))
+            line.Visible = math.random() < 0.3
+        end
+        glitchOverlay.ImageTransparency = 0.6 + math.random() * 0.2
+        RunService.Heartbeat:Wait()
+    end
+    IntroGui:Destroy()
+end)
+
+print("VOID_HUB INTRO HOÀN TẤT! HOẠT ĐỘNG Ở NGOÀI GAME")
+
+-- ================== GUI CHÍNH ==================
+local ControlBtn = Instance.new("TextButton")
+ControlBtn.Size = UDim2.new(0, 140, 0, 50)
+ControlBtn.Position = UDim2.new(0, 10, 0, 10)
+ControlBtn.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
+ControlBtn.BorderSizePixel = 2
+ControlBtn.BorderColor3 = Color3.fromRGB(100, 0, 255)
+ControlBtn.Text = "VOID_HUB"
+ControlBtn.TextColor3 = Color3.fromRGB(200, 0, 255)
+ControlBtn.Font = Enum.Font.GothamBlack
+ControlBtn.TextSize = 20
+ControlBtn.Parent = ScreenGui
+
+local corner = Instance.new("UICorner", ControlBtn)
+corner.CornerRadius = UDim.new(0, 14)
+
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 0, 100)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(150, 0, 255))
+}
+gradient.Rotation = 45
+gradient.Parent = ControlBtn
+
+-- Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 380, 0, 860)
+MainFrame.Position = UDim2.new(0, 160, 0, 10)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+MainFrame.BorderSizePixel = 2
+MainFrame.BorderColor3 = Color3.fromRGB(120, 0, 255)
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local mfCorner = Instance.new("UICorner", MainFrame)
+mfCorner.CornerRadius = UDim.new(0, 16)
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 50)
+Title.BackgroundColor3 = Color3.fromRGB(20, 0, 60)
+Title.Text = "VOID_HUB"
+Title.TextColor3 = Color3.fromRGB(200, 100, 255)
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 22
+Title.Parent = MainFrame
+
+-- Hàm tạo nút
+local function createButton(text, posY, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 340, 0, 42)
+    btn.Position = UDim2.new(0, 20, 0, posY)
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
+    btn.BorderSizePixel = 1
+    btn.BorderColor3 = Color3.fromRGB(100, 0, 200)
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(200, 150, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 15
+    btn.Parent = MainFrame
+    local c = Instance.new("UICorner", btn)
+    c.CornerRadius = UDim.new(0, 10)
+    btn.MouseButton1Click:Connect(callback)
+    return btn
+end
+
+-- === NÚT AUTOWIN ===
+local autowinBtn = createButton("AUTOWIN OBBY: OFF", 60, function()
+    AUTOWIN_ENABLED = not AUTOWIN_ENABLED
+    autowinBtn.Text = "AUTOWIN OBBY: " .. (AUTOWIN_ENABLED and "ON" or "OFF")
+    autowinBtn.BackgroundColor3 = AUTOWIN_ENABLED and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(30, 30, 50)
+    
+    if AUTOWIN_ENABLED then
+        pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/SCRIPTS2012/SCRIPT-BLOXF/refs/heads/main/AUTOWIN%20ALL%20OBBY%20MAP"))()
+        end)
+    end
+end)
+
+-- === NÚT FIX LAG ===
+local fixlagBtn = createButton("FIX LAG VIP: OFF", 110, function()
+    FIXLAG_ENABLED = not FIXLAG_ENABLED
+    fixlagBtn.Text = "FIX LAG VIP: " .. (FIXLAG_ENABLED and "ON" or "OFF")
+    fixlagBtn.BackgroundColor3 = FIXLAG_ENABLED and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(30, 30, 50)
+    
+    if FIXLAG_ENABLED then
+        pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/SCRIPTS2012/SCRIPT-BLOXF/refs/heads/main/Fixlagvip%20by%20Void_team"))()
+        end)
+    end
+end)
+
+-- === GOD MODE (HOẠT ĐỘNG KHI VÀO GAME) ===
+local godModeBtn = createButton("God Mode: OFF", 160, function()
+    GOD_MODE = not GOD_MODE
+    godModeBtn.Text = "God Mode: " .. (GOD_MODE and "ON" or "OFF")
+    godModeBtn.BackgroundColor3 = GOD_MODE and Color3.fromRGB(255, 215, 0) or Color3.fromRGB(30, 30, 50)
+
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        local hum = LocalPlayer.Character.Humanoid
+        hum.MaxHealth = math.huge
+        hum.Health = math.huge
+    end
+
+    LocalPlayer.CharacterAdded:Connect(function(char)
+        wait(0.5)
+        if GOD_MODE then
+            local hum = char:WaitForChild("Humanoid", 5)
+            if hum then
+                hum.MaxHealth = math.huge
+                hum.Health = math.huge
+            end
+        end
+    end)
+end)
+
+-- === TELEPORT TO PLAYERS (HOẠT ĐỘNG Ở LOBBY) ===
+local PlayerListFrame = Instance.new("ScrollingFrame")
+PlayerListFrame.Size = UDim2.new(0, 340, 0, 120)
+PlayerListFrame.Position = UDim2.new(0, 20, 0, 210)
+PlayerListFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+PlayerListFrame.BorderSizePixel = 1
+PlayerListFrame.BorderColor3 = Color3.fromRGB(100, 0, 200)
+PlayerListFrame.ScrollBarThickness = 6
+PlayerListFrame.Parent = MainFrame
+PlayerListFrame.Visible = true
+
+local listCorner = Instance.new("UICorner", PlayerListFrame)
+listCorner.CornerRadius = UDim.new(0, 10)
+
+local listTitle = Instance.new("TextLabel")
+listTitle.Size = UDim2.new(1, 0, 0, 30)
+listTitle.BackgroundTransparency = 1
+listTitle.Text = "TELEPORT TO PLAYERS"
+listTitle.TextColor3 = Color3.fromRGB(200, 150, 255)
+listTitle.Font = Enum.Font.GothamBold
+listTitle.TextSize = 14
+listTitle.Parent = PlayerListFrame
+
+local playerButtons = {}
+local function updatePlayerList()
+    for _, btn in pairs(playerButtons) do btn:Destroy() end
+    playerButtons = {}
+
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(1, -10, 0, 35)
+            btn.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+            btn.Text = plr.Name
+            btn.TextColor3 = Color3.fromRGB(200, 200, 255)
+            btn.Font = Enum.Font.Gotham
+            btn.TextSize = 13
+            btn.Parent = PlayerListFrame
+            local c = Instance.new("UICorner", btn)
+            c.CornerRadius = UDim.new(0, 8)
+
+            btn.MouseButton1Click:Connect(function()
+                if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    local target = plr.Character
+                    if target and target:FindFirstChild("HumanoidRootPart") then
+                        LocalPlayer.Character.HumanoidRootPart.CFrame = target.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+                    end
+                else
+                    -- Nếu chưa có nhân vật → lưu để teleport khi spawn
+                    LocalPlayer.CharacterAdded:Connect(function(char)
+                        wait(1)
+                        local hrp = char:WaitForChild("HumanoidRootPart", 5)
+                        local target = plr.Character
+                        if hrp and target and target:FindFirstChild("HumanoidRootPart") then
+                            hrp.CFrame = target.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+                        end
+                    end)
+                end
+            end)
+            table.insert(playerButtons, btn)
+        end
+    end
+    PlayerListFrame.CanvasSize = UDim2.new(0, 0, 0, #playerButtons * 39 + 34)
+end
+
+Players.PlayerAdded:Connect(updatePlayerList)
+Players.PlayerRemoving:Connect(updatePlayerList)
+
+-- === NÚT ON/OFF CHÍNH ===
+ControlBtn.MouseButton1Click:Connect(function()
+    GUI_OPEN = not GUI_OPEN
+    MainFrame.Visible = GUI_OPEN
+    if GUI_OPEN then
+        updatePlayerList()
+    end
+end)
+
+-- Tự động cập nhật khi vào game
+LocalPlayer.CharacterAdded:Connect(function()
+    wait(1)
+    updatePlayerList()
+end)
+
+print("VOID_HUB ĐÃ SẴN SÀNG! HOẠT ĐỘNG Ở MENU, HUB, LOBBY!")
